@@ -311,6 +311,203 @@
   footer.foot{margin-top:26px;text-align:center;color:var(--muted2);font-size:11px;line-height:1.7}
   footer.foot b{color:var(--muted)}
 
+  /* ---------- 단체회의 (실시간 AI 회의실) ---------- */
+  .keybar{
+    width:100%;display:flex;align-items:center;gap:8px;text-align:left;
+    background:transparent;border:0;padding:0;font-weight:800;font-size:13.5px;color:var(--text);
+  }
+  .keybar .caret{margin-left:auto;color:var(--muted);font-size:11px;transition:transform .18s}
+  .keybar[aria-expanded="true"] .caret{transform:rotate(180deg)}
+  .keygrid{display:grid;gap:9px;margin-top:12px}
+  .aikey{border:1px solid var(--line);border-radius:12px;background:#101625;padding:10px 11px;display:grid;gap:8px;min-width:0}
+  .aikey-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0}
+  .aikey-top .nm{font-weight:800;font-size:13px;white-space:nowrap}
+  .badge{
+    font-size:10.5px;font-weight:800;padding:2px 8px;border-radius:999px;
+    border:1px solid var(--line2);background:#0e1424;color:var(--muted2);white-space:nowrap;
+  }
+  .badge.on{color:var(--teal);border-color:rgba(72,201,176,.45);background:var(--teal-soft)}
+  .aikey .row-in{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:7px;min-width:0}
+  .aikey input[type=password]{
+    width:100%;min-width:0;background:#0b1020;border:1px solid var(--line2);border-radius:10px;
+    padding:9px 10px;font-size:12.5px;outline:none;color:var(--text);letter-spacing:.02em;
+  }
+  .aikey input[type=password]::placeholder{color:#5b6780;letter-spacing:0}
+  .aikey input[type=password]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,181,68,.14)}
+  .aikey select{font-size:12px;padding:9px 26px 9px 9px;background-position:calc(100% - 13px) 16px,calc(100% - 8px) 16px}
+  .toggle{
+    display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);
+    margin-left:auto;cursor:pointer;-webkit-user-select:none;user-select:none;
+  }
+  .toggle input{
+    appearance:none;-webkit-appearance:none;margin:0;flex:0 0 auto;cursor:pointer;
+    width:32px;height:18px;border-radius:999px;background:#1d2537;border:1px solid var(--line2);
+    position:relative;transition:background .15s,border-color .15s;
+  }
+  .toggle input:checked{background:var(--teal);border-color:var(--teal)}
+  .toggle input::after{
+    content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;
+    background:#fff;transition:transform .15s;
+  }
+  .toggle input:checked::after{transform:translateX(14px)}
+
+  .meet-room{padding:0;overflow:hidden}
+  .meet-head{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    padding:11px 13px;border-bottom:1px solid var(--line);background:#101625;
+  }
+  .meet-head .ttl{font-weight:800;font-size:13px}
+  .who-list{display:flex;gap:5px;flex-wrap:wrap;min-width:0}
+  .who-chip{
+    font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:999px;
+    border:1px solid var(--line2);background:#0e1424;color:var(--muted2);white-space:nowrap;
+  }
+  .who-chip.on{color:#c9f5ec;border-color:rgba(72,201,176,.4);background:rgba(72,201,176,.12)}
+
+  .chat{
+    padding:13px;display:flex;flex-direction:column;gap:11px;
+    min-height:170px;max-height:min(58vh,540px);overflow-y:auto;overscroll-behavior:contain;
+    background:radial-gradient(700px 320px at 50% 0,rgba(157,140,255,.06),transparent 70%);
+  }
+  .chat::-webkit-scrollbar{width:6px}
+  .chat::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+  .msg{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .msg .who{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);min-width:0}
+  .msg .who b{color:var(--text);font-size:12px;white-space:nowrap}
+  .msg .who .ava2{
+    width:22px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:12px;
+    background:#1d2537;border:1px solid var(--line2);flex:0 0 auto;
+  }
+  .msg .who .role{font-size:10.5px;color:var(--muted2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  .msg .who .meta{margin-left:auto;font-size:10px;color:var(--muted2);white-space:nowrap;flex:0 0 auto}
+  .bubble{
+    background:linear-gradient(180deg,var(--card2),#141b2a);border:1px solid var(--line);
+    border-radius:14px;padding:10px 12px;font-size:13px;line-height:1.62;color:#dbe4f3;
+    white-space:pre-wrap;word-break:break-word;
+  }
+  .msg.me{align-items:flex-end}
+  .msg.me .bubble{
+    max-width:94%;background:linear-gradient(145deg,#3b2f14,#2b2413);
+    border-color:rgba(242,181,68,.45);color:#ffeccb;
+  }
+  .msg.errmsg .bubble{background:var(--red-soft);border-color:rgba(242,104,92,.45);color:#ffd9d4}
+  .msg-act{display:flex;gap:6px;flex-wrap:wrap}
+  .mini{
+    border:1px solid var(--line2);background:#101625;color:var(--muted);
+    font-size:10.5px;font-weight:800;padding:3px 8px;border-radius:8px;line-height:1.5;
+  }
+  .mini:active{transform:translateY(1px)}
+  .typing{display:inline-flex;gap:4px;align-items:center;vertical-align:middle}
+  .typing i{width:5px;height:5px;border-radius:50%;background:var(--gold2);display:block;animation:blink 1.1s infinite}
+  .typing i:nth-child(2){animation-delay:.18s}
+  .typing i:nth-child(3){animation-delay:.36s}
+  @keyframes blink{0%,60%,100%{opacity:.25}30%{opacity:1}}
+  .pickle{
+    background:linear-gradient(180deg,rgba(72,201,176,.10),rgba(72,201,176,.03));
+    border:1px solid rgba(72,201,176,.42);border-radius:14px;padding:12px;display:grid;gap:8px;
+  }
+  .pickle h4{margin:0;font-size:12.5px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .pickle h4 .tiny{margin-left:auto;font-weight:600}
+  .pickle-t{font-size:12.5px;font-weight:800;color:#d8fff7}
+  .pickle ul{margin:0;padding-left:18px;display:grid;gap:4px;font-size:12px;line-height:1.55;color:#c3cddf}
+  .composer{padding:11px 13px;border-top:1px solid var(--line);background:#0f1524;display:grid;gap:9px}
+  .composer textarea{min-height:64px;max-height:150px;font-size:13px}
+  .chips{display:flex;gap:6px;flex-wrap:wrap}
+  .chip-ex{
+    border:1px dashed var(--line2);background:transparent;color:var(--muted);
+    font-size:11px;font-weight:600;padding:5px 9px;border-radius:999px;text-align:left;line-height:1.35;
+  }
+  .chip-ex:active{transform:translateY(1px)}
+  .btnrow{display:grid;gap:7px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+
+  /* ---------- 대표실 히어로 ---------- */
+  .hero{
+    position:relative;overflow:hidden;border-radius:16px;border:1px solid var(--line);
+    min-height:134px;padding:14px;display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;
+    background:
+      linear-gradient(90deg,rgba(11,14,23,.95) 0%,rgba(11,14,23,.76) 52%,rgba(11,14,23,.42) 100%),
+      url("office-room.png") center 58%/cover no-repeat;
+    box-shadow:0 10px 30px rgba(0,0,0,.28);
+  }
+  .hero-txt{min-width:0;flex:1 1 190px;display:grid;gap:2px}
+  .hero-k{font-size:9.5px;font-weight:900;letter-spacing:.18em;color:var(--gold2)}
+  .hero-txt b{font-size:14.5px;letter-spacing:-.01em;line-height:1.35}
+  .hero-s{font-size:11px;color:#a9b6cc;line-height:1.45}
+  .hero-btn{flex:0 0 auto;margin-left:auto}
+
+  /* ---------- 가상 원탁 회의실 무대 ---------- */
+  .stage{
+    position:relative;width:100%;height:clamp(198px,54vw,330px);
+    background:linear-gradient(180deg,rgba(7,10,18,.16),rgba(7,10,18,.68)),url("office-room.png") center 50%/cover no-repeat;
+    overflow:hidden;isolation:isolate;
+  }
+  .stage::after{
+    content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(180deg,rgba(11,14,23,0) 52%,rgba(11,14,23,.92) 100%),
+               radial-gradient(120% 70% at 50% 100%,rgba(242,181,68,.10),transparent 60%);
+  }
+  .stage-hud{
+    position:absolute;left:10px;top:10px;z-index:4;
+    display:inline-flex;align-items:center;gap:5px;
+    font-size:9.5px;font-weight:800;letter-spacing:.02em;color:#e7eefc;
+    background:rgba(8,11,19,.62);border:1px solid rgba(255,255,255,.16);
+    padding:3px 8px;border-radius:999px;
+    backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);
+  }
+  .stage-hud .stage-state{color:var(--gold2);font-weight:900}
+  #seats{position:absolute;inset:0;z-index:2}
+  .seat{
+    position:absolute;transform:translate(-50%,-50%);
+    display:flex;flex-direction:column;align-items:center;gap:3px;min-width:0;
+  }
+  .seat .avatar{
+    position:relative;width:34px;height:34px;border-radius:12px;display:grid;place-items:center;font-size:16px;
+    background:rgba(10,14,24,.78);border:1px solid rgba(255,255,255,.24);
+    box-shadow:0 4px 14px rgba(0,0,0,.5);
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+    transition:box-shadow .2s,border-color .2s,transform .2s;
+  }
+  .seat .avatar .sd{
+    position:absolute;right:-3px;top:-3px;width:9px;height:9px;border-radius:50%;
+    background:#5d6a83;border:1.5px solid #0b0e17;
+  }
+  .seat.on .avatar .sd{background:#43e0a8;box-shadow:0 0 8px rgba(67,224,168,.85)}
+  .seat .nametag{
+    font-size:9px;font-weight:800;color:#eef3ff;white-space:nowrap;
+    background:rgba(8,11,18,.72);border:1px solid rgba(255,255,255,.16);
+    padding:1px 6px;border-radius:999px;
+    backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  }
+  .seat.off .avatar,.seat.off .nametag{opacity:.42;filter:saturate(.35)}
+  .seat-ceo .avatar{background:linear-gradient(145deg,#4a3a12,#241d0d);border-color:rgba(242,181,68,.62)}
+  .seat.talking .avatar{
+    border-color:rgba(255,212,121,.95);transform:scale(1.07);
+    box-shadow:0 0 0 2px rgba(242,181,68,.5),0 0 26px 8px rgba(242,181,68,.38);
+  }
+  .seat.talking .avatar .sd{background:var(--gold2);box-shadow:0 0 10px rgba(242,181,68,.95)}
+  .seat.talking .avatar::after{
+    content:"";position:absolute;inset:-4px;border-radius:15px;
+    border:2px solid rgba(255,212,121,.85);animation:seatring 1.5s ease-out infinite;pointer-events:none;
+  }
+  @keyframes seatring{0%{transform:scale(.9);opacity:.9}70%{transform:scale(1.45);opacity:0}100%{opacity:0}}
+  .seat-bubble{
+    position:absolute;bottom:calc(100% + 9px);white-space:nowrap;
+    font-size:9px;font-weight:900;color:#241802;
+    background:linear-gradient(145deg,var(--gold2),var(--gold));
+    padding:2px 7px;border-radius:7px;box-shadow:0 4px 12px rgba(242,181,68,.35);
+    opacity:0;transform:translateY(4px);transition:opacity .18s,transform .18s;pointer-events:none;
+  }
+  .seat-bubble::after{
+    content:"";position:absolute;left:50%;top:100%;transform:translateX(-50%);
+    border:4px solid transparent;border-top-color:var(--gold);
+  }
+  .seat.talking .seat-bubble{opacity:1;transform:translateY(0)}
+
+  @media (min-width:701px){
+    .btnrow{grid-template-columns:1fr 1fr}
+  }
+
   @media (max-width:560px){
     body{font-size:14.5px}
     .wrap{padding:0 13px 34px}
@@ -321,7 +518,8 @@
     .drive-link{padding:7px 9px;font-size:11.5px}
     .tabs{top:57px}
     .tabs-in{padding:8px 13px;gap:5px}
-    .tab{padding:8px 10px;font-size:12px;gap:5px;flex:1 1 auto}
+    .tab{padding:7px 7px;font-size:11.5px;gap:4px;flex:1 1 auto}
+    .tab .n{font-size:10px;padding:0 5px}
     .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
     .kpi .v{font-size:18px}
     .execs{grid-template-columns:1fr}
@@ -330,6 +528,20 @@
     .cand{grid-template-columns:minmax(0,1fr)}
     .cand-act{flex-direction:row;justify-content:flex-end}
     .item{grid-template-columns:auto minmax(0,1fr) auto}
+    .aikey .row-in{grid-template-columns:minmax(0,1fr) 116px}
+    .meet-head{padding:10px 11px}
+    .chat{padding:11px;max-height:58vh}
+    .composer{padding:10px 11px}
+    .bubble{font-size:12.8px}
+    .pickle{padding:11px}
+    .msg .who .role{max-width:130px}
+    .hero{min-height:116px;padding:12px}
+    .hero-txt b{font-size:13.5px}
+    .hero-s{font-size:10.5px}
+    .stage{height:clamp(186px,56vw,250px)}
+    .seat .avatar{width:30px;height:30px;font-size:14px;border-radius:11px}
+    .seat .nametag{font-size:8.5px;padding:0 5px}
+    .seat-bubble{font-size:8.5px}
   }
 </style>
 </head>
@@ -353,8 +565,9 @@
 <nav class="tabs" aria-label="사무실 구역">
   <div class="tabs-in" role="tablist">
     <button class="tab" role="tab" id="tabbtn-hq" aria-selected="true" aria-controls="pane-hq" data-pane="hq">👑 대표실</button>
+    <button class="tab" role="tab" id="tabbtn-meet" aria-selected="false" aria-controls="pane-meet" data-pane="meet">💬 단체회의 <span class="n" id="cntMeet">0</span></button>
     <button class="tab" role="tab" id="tabbtn-cands" aria-selected="false" aria-controls="pane-cands" data-pane="cands">📊 사업후보 <span class="n" id="cntCand">0</span></button>
-    <button class="tab" role="tab" id="tabbtn-room" aria-selected="false" aria-controls="pane-room" data-pane="room">📝 회의실 <span class="n" id="cntAgenda">0</span></button>
+    <button class="tab" role="tab" id="tabbtn-memo" aria-selected="false" aria-controls="pane-memo" data-pane="memo">📝 메모 <span class="n" id="cntAgenda">0</span></button>
   </div>
 </nav>
 
@@ -362,7 +575,16 @@
 
   <!-- ================= 대표실 ================= -->
   <section class="tabpane" id="pane-hq" role="tabpanel" aria-labelledby="tabbtn-hq">
-    <div class="kpis">
+    <div class="hero">
+      <div class="hero-txt">
+        <span class="hero-k">SOND-OFFICE</span>
+        <b>AI 임원 4명이 상주하는 온라인 사무실</b>
+        <span class="hero-s">회의실에서 3개 AI가 순서대로 토론하고, 피클이 실행안을 정리합니다</span>
+      </div>
+      <button class="btn sm primary hero-btn" type="button" data-goto="meet">회의실 입장 →</button>
+    </div>
+
+    <div class="kpis" style="margin-top:10px">
       <div class="kpi"><div class="k">임원진</div><div class="v">4<small>명</small></div></div>
       <div class="kpi"><div class="k">사업 후보</div><div class="v" id="kpiCand">0<small>개</small></div></div>
       <div class="kpi hl"><div class="k">1순위</div><div class="v" id="kpiTop">0<small>개</small></div></div>
@@ -384,7 +606,59 @@
 
     <h2 class="sec">킥오프 회의 프롬프트 <span class="hint">각 AI에게 그대로 붙여넣기</span></h2>
     <div class="prompts" id="promptGrid"></div>
-    <p class="tiny" style="margin:9px 2px 0">1단계 답을 모아 2단계에 붙이면 1위만 남습니다. 나온 답은 <b style="color:#c3cddf">📝 회의실 → 메모장</b>에 붙여두세요. 원본은 드라이브 <b style="color:#c3cddf">01_회의실_안건·회의록</b>에 있습니다.</p>
+    <p class="tiny" style="margin:9px 2px 0">1단계 답을 모아 2단계에 붙이면 1위만 남습니다. 손으로 돌리기 번거로우면 <b style="color:#c3cddf">💬 단체회의</b> 탭에서 키만 넣고 자동으로 진행하세요. 원본은 드라이브 <b style="color:#c3cddf">01_회의실_안건·회의록</b>에 있습니다.</p>
+  </section>
+
+  <!-- ================= 단체회의 ================= -->
+  <section class="tabpane" id="pane-meet" role="tabpanel" aria-labelledby="tabbtn-meet" hidden>
+    <h2 class="sec">실시간 AI 단체 회의실 <span class="hint">순차 토론 → 반론 → 1위 확정</span></h2>
+
+    <div class="card pad">
+      <button type="button" class="keybar" id="keyToggle" aria-expanded="false" aria-controls="keyPanel">
+        <span aria-hidden="true">🔑</span><span>AI API 키 설정</span>
+        <span class="badge" id="keySummary">미입력</span>
+        <span class="caret" aria-hidden="true">▾</span>
+      </button>
+      <div id="keyPanel" hidden>
+        <div class="keygrid" id="keyGrid"></div>
+        <p class="tiny" style="margin:10px 2px 0">키는 내 브라우저(<b style="color:#c3cddf">localStorage</b>)에만 저장되며 외부 서버나 GitHub에 올라가지 않습니다. 이 기기에서 각 AI사 API로 직접 호출합니다.</p>
+        <div class="row" style="margin-top:9px">
+          <button class="btn sm danger" type="button" id="clearKeys">저장된 키 모두 지우기</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card meet-room" style="margin-top:10px">
+      <div class="stage" id="stage">
+        <div class="stage-hud"><span aria-hidden="true">🏢</span> SOND-OFFICE 임원 회의실 <span class="stage-state" id="stageState">대기 중</span></div>
+        <div id="seats"></div>
+      </div>
+      <div class="meet-head">
+        <span class="ttl">💬 회의 진행</span>
+        <div class="who-list" id="meetWho"></div>
+        <span class="spacer"></span>
+        <span class="tiny" id="meetState">대기 중</span>
+      </div>
+      <div class="chat" id="chat" aria-live="polite" aria-atomic="false"></div>
+      <div class="composer">
+        <div class="chips" id="exChips"></div>
+        <div class="field">
+          <label for="agendaIn">대표님 안건</label>
+          <textarea id="agendaIn" maxlength="2000" placeholder="회사 방향이나 안건을 적으세요. 예: 무인 AI 디지털 상품 회사로 갈 건데 수익 모델 1개만 정해줘"></textarea>
+        </div>
+        <div class="btnrow">
+          <button class="btn primary" type="button" id="startRound1">🚀 회의 시작 (1라운드)</button>
+          <button class="btn" type="button" id="startRound2" disabled>🔥 서로 반론 &amp; 1위 확정 (2라운드)</button>
+        </div>
+        <div class="row">
+          <button class="btn sm" type="button" id="copyMinutes">📋 전체 회의록 복사</button>
+          <span class="spacer"></span>
+          <button class="btn sm danger" type="button" id="clearChat">🗑️ 대화 비우기</button>
+        </div>
+      </div>
+    </div>
+
+    <p class="tiny" style="margin:10px 2px 0">키가 있는 AI만으로도 진행됩니다. 발언이 마음에 들면 말풍선의 <b style="color:#c3cddf">📊 후보로 추가</b>로 사업후보에 바로 넘기고, 마지막 요약은 <b style="color:#c3cddf">📋 피클 채팅에 넘길 실행 요약 복사</b>로 피클에게 주세요.</p>
   </section>
 
   <!-- ================= 사업후보 ================= -->
@@ -429,8 +703,8 @@
     <div class="cand-list" id="candList"></div>
   </section>
 
-  <!-- ================= 회의실 ================= -->
-  <section class="tabpane" id="pane-room" role="tabpanel" aria-labelledby="tabbtn-room" hidden>
+  <!-- ================= 메모 ================= -->
+  <section class="tabpane" id="pane-memo" role="tabpanel" aria-labelledby="tabbtn-memo" hidden>
     <h2 class="sec">안건 &amp; 결정사항 <span class="hint">체크해서 하나씩 끝내기</span></h2>
     <div class="card pad">
       <form class="row" id="agendaForm" autocomplete="off">
@@ -445,11 +719,11 @@
       </div>
     </div>
 
-    <h2 class="sec">회의 메모장 <span class="hint">다른 AI 답변 붙여넣기 · 자동 저장</span></h2>
+    <h2 class="sec">회의 메모장 <span class="hint">단체회의 요약·결정사항 붙여넣기 · 자동 저장</span></h2>
     <div class="card pad">
       <div class="field">
         <label for="memo">메모</label>
-        <textarea id="memo" placeholder="클로드·챗GPT·제미나이 답변을 붙여넣고, 서로 반론시킨 2단계 결과와 결정사항을 여기에 정리하세요. 입력하면 자동 저장됩니다."></textarea>
+        <textarea id="memo" placeholder="💬 단체회의에서 복사한 회의록이나 결정사항을 여기에 붙여두세요. 입력하면 자동 저장됩니다."></textarea>
       </div>
       <div class="row" style="margin-top:9px">
         <span class="tiny" id="memoStat">0자</span>
@@ -891,8 +1165,9 @@
 
   /* ================= tabs ================= */
   function showPane(name){
-    ["hq","cands","room"].forEach(function(k){
+    ["hq","meet","cands","memo"].forEach(function(k){
       var pane = $("pane-" + k), btn = $("tabbtn-" + k);
+      if(!pane || !btn) return;
       var on = k === name;
       pane.hidden = !on;
       btn.setAttribute("aria-selected", on ? "true" : "false");
@@ -1019,6 +1294,713 @@
     if(ev.key === "Escape" && !$("modal").hidden) $("modal").hidden = true;
   });
 
+  /* ================= 단체회의 (실시간 AI 회의실) ================= */
+  var KEYS_KEY = "sond-office-ai-keys-v1";
+  var MEET_KEY = "sond-office-meeting-v1";
+
+  var AIS = [
+    { id:"anthropic", name:"클로드", emoji:"🧠", role:"수석 기획자 · 사업 구조 설계",
+      keyHint:"sk-ant-... (Anthropic API 키)",
+      models:[{ v:"claude-sonnet-4-20250514", label:"claude-sonnet-4 (기본)" },
+              { v:"claude-3-7-sonnet-20250219", label:"claude-3-7-sonnet" }],
+      persona:"너는 인건비 없이 AI만으로 굴러가는 1인 회사의 수석 기획자·아키텍트다. 사업 구조를 설계하고 타깃·단가·수익모델·실행 순서를 논리적으로 정리한다. 과장 없이 오늘 바로 실행할 수 있는 문장으로 쓴다." },
+    { id:"openai", name:"챗GPT", emoji:"🔎", role:"전략기획 · 딥리서치",
+      keyHint:"sk-... (OpenAI API 키)",
+      models:[{ v:"gpt-4o", label:"gpt-4o (기본)" },
+              { v:"gpt-4o-mini", label:"gpt-4o-mini (저렴)" }],
+      persona:"너는 1인 AI 회사의 전략기획·딥리서치 팀장이다. 시장 규모·경쟁사·수익을 숫자로 검증하고 다른 의견의 허점을 지적한다. 확인되지 않은 숫자는 '추정'이라고 밝힌다." },
+    { id:"google", name:"제미나이", emoji:"🎬", role:"미디어 · 대량 자동화",
+      keyHint:"AIza... (Google AI Studio 키)",
+      models:[{ v:"gemini-2.5-flash", label:"gemini-2.5-flash (기본)" },
+              { v:"gemini-2.0-flash", label:"gemini-2.0-flash (폴백)" }],
+      persona:"너는 1인 AI 회사의 미디어·대량 자동화 실무자다. 트렌드 수집, 콘텐츠 대량 생산, 모니터링 자동화 관점에서 답하고, 오늘 바로 돌릴 수 있는 자동화 단계로 쪼갠다." }
+  ];
+  var AI_BY = {};
+  AIS.forEach(function(a){ AI_BY[a.id] = a; });
+
+  var keyStore = {}, joinStore = {};
+  AIS.forEach(function(a){ keyStore[a.id] = { key:"", model:a.models[0].v }; joinStore[a.id] = true; });
+
+  var meet = { msgs:[], round:0, run:0, agenda:"", typing:null, running:false };
+
+  function hasKey(ai){ return !!(keyStore[ai.id] && String(keyStore[ai.id].key || "").trim()); }
+  function modelOf(ai){
+    var m = keyStore[ai.id] ? keyStore[ai.id].model : "";
+    for(var i = 0; i < ai.models.length; i++){ if(ai.models[i].v === m) return m; }
+    return ai.models[0].v;
+  }
+  function activeAIs(){
+    return AIS.filter(function(a){ return hasKey(a) && joinStore[a.id] !== false; });
+  }
+
+  /* ---------- 원탁 회의실 무대 ---------- */
+  var SEATS = [
+    { id:"ceo", name:"손성훈 대표", emoji:"👑", role:"의사결정 · 최종 승인", x:50, y:89 },
+    { id:"anthropic", x:19, y:68 },
+    { id:"openai", x:33, y:50 },
+    { id:"google", x:67, y:50 },
+    { id:"pickle", name:"피클", emoji:"🥒", role:"총괄 운영실장 · 실행 정리", x:81, y:68 }
+  ];
+
+  function renderSeats(){
+    var host = $("seats");
+    if(!host) return;
+    host.innerHTML = "";
+    SEATS.forEach(function(s){
+      var ai = AI_BY[s.id] || null;
+      var node = el("div", "seat seat-" + s.id);
+      node.style.left = s.x + "%";
+      node.style.top = s.y + "%";
+      node.setAttribute("data-seat", s.id);
+      node.setAttribute("role", "img");
+      node.setAttribute("aria-label", (ai ? ai.name : s.name) + " 자리");
+      var bubble = el("div", "seat-bubble", "발언 중...");
+      bubble.setAttribute("aria-hidden", "true");
+      node.appendChild(bubble);
+      var av = el("div", "avatar", ai ? ai.emoji : s.emoji);
+      av.appendChild(el("span", "sd"));
+      node.appendChild(av);
+      node.appendChild(el("div", "nametag", ai ? ai.name : s.name));
+      host.appendChild(node);
+    });
+    updateSeats();
+  }
+
+  function updateSeats(){
+    var host = $("seats");
+    if(!host) return;
+    Array.prototype.forEach.call(host.querySelectorAll(".seat"), function(node){
+      var id = node.getAttribute("data-seat");
+      var ai = AI_BY[id] || null;
+      var on = true, label = ai ? ai.name : "";
+      if(ai){
+        if(hasKey(ai) && joinStore[id] !== false) on = true;
+        else { on = false; label = ai.name + (hasKey(ai) ? " 제외" : " 대기"); }
+      }
+      node.classList.toggle("on", on);
+      node.classList.toggle("off", !on);
+      node.classList.toggle("talking", meet.typing === id);
+      var tag = node.querySelector(".nametag");
+      if(tag) tag.textContent = label;
+    });
+    var st = $("stageState");
+    if(st){
+      if(meet.typing && AI_BY[meet.typing]) st.textContent = AI_BY[meet.typing].name + " 발언 중";
+      else if(meet.running) st.textContent = "진행 중";
+      else if(meet.msgs.length){
+        var said = meet.msgs.filter(function(m){ return m.kind === "ai"; }).length;
+        st.textContent = (meet.round || 1) + "라운드 · " + said + "발언";
+      }
+      else st.textContent = "대기 중";
+    }
+  }
+
+  function flashSeat(id, ms){
+    var node = document.querySelector('#seats .seat[data-seat="' + id + '"]');
+    if(!node) return;
+    node.classList.add("talking");
+    setTimeout(function(){ if(meet.typing !== id) node.classList.remove("talking"); }, ms || 1400);
+  }
+
+  function loadKeyStore(){
+    try{
+      var d = JSON.parse(localStorage.getItem(KEYS_KEY) || "{}") || {};
+      AIS.forEach(function(a){
+        var r = (d && d[a.id]) || {};
+        keyStore[a.id] = { key: typeof r.key === "string" ? r.key : "",
+                           model: typeof r.model === "string" ? r.model : a.models[0].v };
+        joinStore[a.id] = r.join === false ? false : true;
+      });
+    }catch(e){ /* ignore broken store */ }
+  }
+  function saveKeyStore(){
+    try{
+      var out = {};
+      AIS.forEach(function(a){
+        out[a.id] = { key: keyStore[a.id].key, model: keyStore[a.id].model, join: joinStore[a.id] };
+      });
+      localStorage.setItem(KEYS_KEY, JSON.stringify(out));
+    }catch(e){ toast("키를 저장하지 못했습니다(브라우저 저장 공간 부족)", { error:true }); }
+  }
+
+  function renderKeyPanel(){
+    var host = $("keyGrid");
+    host.innerHTML = "";
+    AIS.forEach(function(ai){
+      var rec = keyStore[ai.id];
+      var box = el("div", "aikey");
+
+      var top = el("div", "aikey-top");
+      top.appendChild(el("span", "nm", ai.emoji + " " + ai.name));
+      var badge = el("span", "badge" + (hasKey(ai) ? " on" : ""), hasKey(ai) ? "연결됨(키 있음)" : "미입력");
+      badge.id = "badge-" + ai.id;
+      top.appendChild(badge);
+
+      var lab = el("label", "toggle");
+      var cb = document.createElement("input");
+      cb.type = "checkbox"; cb.id = "join-" + ai.id;
+      cb.checked = joinStore[ai.id] !== false;
+      cb.setAttribute("aria-label", ai.name + " 이번 회의 참여");
+      cb.addEventListener("change", function(){
+        joinStore[ai.id] = cb.checked; saveKeyStore(); renderMeetWho(); syncButtons();
+      });
+      lab.appendChild(cb);
+      lab.appendChild(el("span", null, "이번 회의 참여"));
+      top.appendChild(lab);
+      box.appendChild(top);
+
+      var row = el("div", "row-in");
+      var inp = document.createElement("input");
+      inp.type = "password"; inp.id = "key-" + ai.id;
+      inp.value = rec.key;
+      inp.placeholder = ai.keyHint;
+      inp.setAttribute("aria-label", ai.name + " API 키");
+      inp.setAttribute("autocomplete", "off");
+      inp.setAttribute("spellcheck", "false");
+      var deb = null;
+      inp.addEventListener("input", function(){
+        rec.key = inp.value;
+        if(hasKey(ai)){ badge.textContent = "연결됨(키 있음)"; badge.classList.add("on"); }
+        else { badge.textContent = "미입력"; badge.classList.remove("on"); }
+        clearTimeout(deb);
+        deb = setTimeout(function(){ saveKeyStore(); renderMeetWho(); syncButtons(); renderKeySummary(); }, 400);
+      });
+      row.appendChild(inp);
+
+      var sel = document.createElement("select");
+      sel.id = "model-" + ai.id;
+      sel.setAttribute("aria-label", ai.name + " 모델");
+      ai.models.forEach(function(m){
+        var o = document.createElement("option");
+        o.value = m.v; o.textContent = m.label;
+        if(modelOf(ai) === m.v) o.selected = true;
+        sel.appendChild(o);
+      });
+      sel.addEventListener("change", function(){ rec.model = sel.value; saveKeyStore(); });
+      row.appendChild(sel);
+      box.appendChild(row);
+      host.appendChild(box);
+    });
+    renderKeySummary();
+  }
+
+  function renderKeySummary(){
+    var n = AIS.filter(hasKey).length;
+    var b = $("keySummary");
+    if(!b) return;
+    b.textContent = n === 0 ? "미입력" : (n + "/3 연결됨");
+    b.classList.toggle("on", n > 0);
+  }
+
+  function setKeyPanel(open){
+    $("keyPanel").hidden = !open;
+    $("keyToggle").setAttribute("aria-expanded", open ? "true" : "false");
+  }
+
+  function renderMeetWho(){
+    var host = $("meetWho");
+    host.innerHTML = "";
+    AIS.forEach(function(ai){
+      var on = hasKey(ai) && joinStore[ai.id] !== false;
+      var label = ai.emoji + " " + ai.name;
+      if(!hasKey(ai)) label += " 키 없음";
+      else if(!on) label += " 제외";
+      else label += " 참여";
+      host.appendChild(el("span", "who-chip" + (on ? " on" : ""), label));
+    });
+    updateSeats();
+  }
+
+  function renderMeetStats(){
+    var n = meet.msgs.length;
+    if($("cntMeet")) $("cntMeet").textContent = n;
+  }
+
+  function setMeetState(t){ $("meetState").textContent = t; }
+
+  function syncButtons(){
+    var hasR1 = meet.msgs.some(function(m){ return m.kind === "ai" && m.round === 1; });
+    $("startRound1").disabled = meet.running;
+    $("startRound2").disabled = meet.running || !hasR1;
+    $("copyMinutes").disabled = meet.msgs.length === 0;
+    $("clearChat").disabled = meet.msgs.length === 0;
+  }
+
+  function loadMeet(){
+    try{
+      var d = JSON.parse(localStorage.getItem(MEET_KEY) || "{}") || {};
+      meet.msgs = Array.isArray(d.msgs) ? d.msgs.filter(function(m){ return m && m.kind && typeof m.text === "string"; }).slice(-80) : [];
+      meet.round = typeof d.round === "number" ? d.round : 0;
+      meet.run = typeof d.run === "number" ? d.run : 0;
+      meet.agenda = typeof d.agenda === "string" ? d.agenda : "";
+      if(meet.agenda) $("agendaIn").value = meet.agenda;
+    }catch(e){ meet.msgs = []; meet.round = 0; meet.run = 0; meet.agenda = ""; }
+  }
+
+  function saveMeet(){
+    try{
+      if(meet.msgs.length > 80) meet.msgs = meet.msgs.slice(-80);
+      localStorage.setItem(MEET_KEY, JSON.stringify({
+        msgs: meet.msgs, round: meet.round, run: meet.run, agenda: meet.agenda
+      }));
+    }catch(e){ /* over quota: keep in memory */ }
+  }
+
+  function renderChat(){
+    var host = $("chat");
+    host.innerHTML = "";
+    if(meet.msgs.length === 0 && !meet.typing){
+      var e = el("div", "empty");
+      e.appendChild(el("b", null, "아직 회의가 없습니다"));
+      e.appendChild(el("span", null, "🔑 AI API 키를 넣고 안건을 적은 뒤 ‘🚀 회의 시작’을 누르세요. 키가 있는 AI만으로도 진행됩니다."));
+      host.appendChild(e);
+    }
+    meet.msgs.forEach(function(m){ host.appendChild(msgNode(m)); });
+    if(meet.typing && AI_BY[meet.typing]) host.appendChild(typingNode(AI_BY[meet.typing]));
+    host.scrollTop = host.scrollHeight;
+    updateSeats();
+  }
+
+  function msgNode(m){
+    if(m.kind === "pickle") return pickleNode(m);
+    var ai = AI_BY[m.who] || null;
+    var wrap = el("div", "msg" + (m.kind === "user" ? " me" : "") + (m.kind === "err" ? " errmsg" : ""));
+    var who = el("div", "who");
+    if(ai){
+      who.appendChild(el("span", "ava2", ai.emoji));
+      who.appendChild(el("b", null, ai.name));
+      who.appendChild(el("span", "role", ai.role));
+    } else {
+      who.appendChild(el("span", "ava2", "👑"));
+      who.appendChild(el("b", null, "손성훈 대표"));
+      who.appendChild(el("span", "role", "안건"));
+    }
+    if(m.round) who.appendChild(el("span", "meta", m.round + "라운드"));
+    wrap.appendChild(who);
+    wrap.appendChild(el("div", "bubble", m.text));
+    if(m.kind === "ai"){
+      var act = el("div", "msg-act");
+      var b = el("button", "mini", "📊 후보로 추가");
+      b.type = "button";
+      b.addEventListener("click", function(){ addFromMessage(m); });
+      act.appendChild(b);
+      wrap.appendChild(act);
+    }
+    return wrap;
+  }
+
+  function typingNode(ai){
+    var wrap = el("div", "msg");
+    var who = el("div", "who");
+    who.appendChild(el("span", "ava2", ai.emoji));
+    who.appendChild(el("b", null, ai.name));
+    who.appendChild(el("span", "role", ai.role));
+    wrap.appendChild(who);
+    var b = el("div", "bubble");
+    var dots = el("span", "typing");
+    dots.appendChild(el("i")); dots.appendChild(el("i")); dots.appendChild(el("i"));
+    b.appendChild(dots);
+    b.appendChild(el("span", null, " 답변 작성 중…"));
+    wrap.appendChild(b);
+    return wrap;
+  }
+
+  function pickleNode(m){
+    var card = el("div", "pickle");
+    var h = el("h4");
+    h.appendChild(el("span", null, "🥒"));
+    h.appendChild(el("span", null, "피클 · 총괄 운영실장 요약"));
+    h.appendChild(el("span", "tiny", m.head || (m.round + "라운드")));
+    card.appendChild(h);
+    if(m.title) card.appendChild(el("div", "pickle-t", m.title));
+    var ul = el("ul");
+    (m.items || []).forEach(function(t){ ul.appendChild(el("li", null, t)); });
+    card.appendChild(ul);
+    var row = el("div", "row");
+    var b = el("button", "btn sm primary", "📋 피클 채팅에 넘길 실행 요약 복사");
+    b.type = "button";
+    b.addEventListener("click", function(){
+      copyWithToast(m.copyText || m.text || "", "피클에게 넘길 실행 요약 복사 완료");
+    });
+    row.appendChild(b);
+    card.appendChild(row);
+    return card;
+  }
+
+  function copyWithToast(text, okMsg){
+    copyText(text).then(function(ok){
+      if(ok) toast("📋 " + okMsg);
+      else { openManualCopy(text); toast("자동 복사가 막혀 직접 복사 창을 열었습니다", { error:true }); }
+    });
+  }
+
+  /* ---------- 프롬프트 ---------- */
+  function systemPrompt(ai, round){
+    var base = ai.persona + "\n\n공통 규칙:\n" +
+      "- 한국어로 답한다. 인사말·자기소개·면책 문구 없이 바로 본론.\n" +
+      "- 500자 안뀜, 불릿은 5개 이내. 표는 쓰지 않는다.\n" +
+      "- 실행 가능한 것만 쓴다. 추정이면 '추정'이라고 밝힌다.\n" +
+      "- 참석자 이름은 클로드·챗GPT·제미나이·피클 뿐이다. 없는 AI를 만들지 않는다.";
+    if(round === 1){
+      return base + "\n\n이번 라운드 출력 형식:\n1) 내 판단 (한 줄)\n2) 근거 2개 (숫자·기간 포함)\n3) 오늘 1시간 안에 할 첫 행동 1개";
+    }
+    return base + "\n\n이번 라운드(반론) 출력 형식:\n1) 다른 AI 발언 중 가장 약한 점 1개 (어느 AI의 어떤 주장인지 명시)\n2) 최종 1위로 남길 모델 1개 (이름만 명확히)\n3) 7일 실행안 (1~2일 / 3~4일 / 5~7일)";
+  }
+
+  function userPrompt(ai, round, agenda, ctx){
+    var out = "[대표님 안건]\n" + (agenda || "(안건 미기재)") + "\n";
+    if(round === 1){
+      out += "\n[이번 라운드 지금까지 발언]\n" +
+        (ctx.r1.length ? ctx.r1.map(function(p){ return "· " + p.name + ": " + p.text; }).join("\n\n")
+                       : "(아직 없다 — 네가 첫 발언자다.)");
+      out += "\n\n" + ai.name + "으로서 위 안건에 답해라. 앞 발언과 겹치면 반복하지 말고 보완·대안에 집중해라.";
+      return out;
+    }
+    out += "\n[1라운드 전체 발언]\n" +
+      ctx.r1.map(function(p){ return "· " + p.name + ": " + p.text; }).join("\n\n");
+    if(ctx.r2.length){
+      out += "\n\n[이번 라운드 앞선 발언]\n" +
+        ctx.r2.map(function(p){ return "· " + p.name + ": " + p.text; }).join("\n\n");
+    }
+    out += "\n\n" + ai.name + "으로서 1라운드 발언들을 검토해 ①가장 약한 점을 반박하고 ②최종 1위 모델 1개를 이름으로 확정하고 ③7일 실행안을 써라.";
+    return out;
+  }
+
+  function contextFor(round, run){
+    var r1run = 0;
+    meet.msgs.forEach(function(m){
+      if(m.kind === "ai" && m.round === 1 && m.run > r1run) r1run = m.run;
+    });
+    var r1 = meet.msgs.filter(function(m){ return m.kind === "ai" && m.round === 1 && m.run === (round === 1 ? run : r1run); })
+      .map(function(m){ return { name: AI_BY[m.who].name, text: m.text }; });
+    var r2 = round === 2
+      ? meet.msgs.filter(function(m){ return m.kind === "ai" && m.round === 2 && m.run === run; })
+          .map(function(m){ return { name: AI_BY[m.who].name, text: m.text }; })
+      : [];
+    return { r1: r1, r2: r2 };
+  }
+
+  /* ---------- API 호출 ---------- */
+  function httpError(status, detail){
+    var msg = String(detail || ("HTTP " + status)).slice(0, 240);
+    var e = new Error(msg);
+    e.status = status; e.detail = msg;
+    return e;
+  }
+
+  function requestOnce(ai, model, key, system, user){
+    var ctrl = null, timer = null;
+    try{ ctrl = new AbortController(); timer = setTimeout(function(){ ctrl.abort(); }, 70000); }catch(e){ ctrl = null; }
+    var url, opts;
+    if(ai.id === "anthropic"){
+      url = "https://api.anthropic.com/v1/messages";
+      opts = { method:"POST", headers:{
+                 "content-type":"application/json",
+                 "x-api-key":key,
+                 "anthropic-version":"2023-06-01",
+                 "anthropic-dangerous-direct-browser-access":"true" },
+               body: JSON.stringify({ model:model, max_tokens:1200, temperature:0.7,
+                                      system:system, messages:[{ role:"user", content:user }] }) };
+    } else if(ai.id === "openai"){
+      url = "https://api.openai.com/v1/chat/completions";
+      opts = { method:"POST", headers:{ "content-type":"application/json", "authorization":"Bearer " + key },
+               body: JSON.stringify({ model:model, max_tokens:1200, temperature:0.7,
+                                      messages:[{ role:"system", content:system }, { role:"user", content:user }] }) };
+    } else {
+      url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent";
+      opts = { method:"POST", headers:{ "content-type":"application/json", "x-goog-api-key":key },
+               body: JSON.stringify({ systemInstruction:{ parts:[{ text:system }] },
+                                      contents:[{ role:"user", parts:[{ text:user }] }],
+                                      generationConfig:{ temperature:0.7, maxOutputTokens:1200 } }) };
+    }
+    if(ctrl) opts.signal = ctrl.signal;
+
+    var done = function(){ if(timer) clearTimeout(timer); };
+    return fetch(url, opts).then(function(res){
+      return res.text().then(function(txt){
+        if(!res.ok){
+          var det = txt;
+          try{ var j = JSON.parse(txt); det = (j.error && (j.error.message || j.error.status || j.error.code)) || txt; }catch(e){}
+          throw httpError(res.status, det);
+        }
+        var d;
+        try{ d = JSON.parse(txt); }catch(e){ throw httpError(res.status, "응답을 해석할 수 없습니다"); }
+        var out = "";
+        if(ai.id === "anthropic"){
+          out = (d.content || []).map(function(b){ return b.text || ""; }).join("").trim();
+        } else if(ai.id === "openai"){
+          out = ((((d.choices || [])[0] || {}).message) || {}).content || "";
+        } else {
+          var cand = (d.candidates || [])[0] || {};
+          out = (((cand.content || {}).parts) || []).map(function(p){ return p.text || ""; }).join("").trim();
+          if(!out && d.promptFeedback && d.promptFeedback.blockReason){
+            throw httpError(502, "안전 정책으로 차단됨(" + d.promptFeedback.blockReason + ")");
+          }
+        }
+        if(!out) throw httpError(502, "빈 응답을 돌려받았습니다");
+        return out;
+      }).then(function(v){ done(); return v; }, function(e2){ done(); throw e2; });
+    }, function(e3){ done(); throw e3; });
+  }
+
+  function callAI(ai, system, user){
+    var key = String((keyStore[ai.id] && keyStore[ai.id].key) || "").trim();
+    if(!key){
+      var e = new Error("no key"); e.code = "no_key";
+      return Promise.reject(e);
+    }
+    var primary = modelOf(ai);
+    return requestOnce(ai, primary, key, system, user).catch(function(err){
+      if(ai.id === "google" && primary !== "gemini-2.0-flash" && (err.status === 404 || err.status === 400)){
+        return requestOnce(ai, "gemini-2.0-flash", key, system, user);
+      }
+      throw err;
+    });
+  }
+
+  function koError(ai, err){
+    err = err || {};
+    if(err.code === "no_key") return "🔑 " + ai.name + " API 키가 없습니다 — 위 ‘AI API 키 설정’에서 입력하세요.";
+    if(err.name === "AbortError") return "⏱ " + ai.name + " 응답이 70초를 넘어 중단했습니다. 다시 시도하세요.";
+    var s = err.status;
+    var d = err.detail ? String(err.detail).slice(0, 120) : "";
+    if(s === 401 || s === 403) return "🔒 " + ai.name + ": API 키가 올바르지 않거나 권한이 없습니다(" + s + "). 키를 다시 확인하세요.";
+    if(s === 429) return "💳 " + ai.name + ": 요청·크레딧 한도를 초과했습니다(429). 잠시 뒤 다시 시도하거나 결제·한도를 확인하세요.";
+    if(s === 400 || s === 404) return "⚙️ " + ai.name + ": 요청이 거절되었습니다(" + s + "). 모델명을 확인하세요." + (d ? " — " + d : "");
+    if(s === 502) return "⚠️ " + ai.name + ": 응답을 받지 못했습니다." + (d ? " — " + d : "");
+    if(!s) return "🌐 " + ai.name + ": 브라우저에서 직접 호출이 막혔거나 네트워크 오류입니다(CORS·연결). 키와 인터넷 연결을 확인하세요." + (d ? " — " + d : "");
+    return "⚠️ " + ai.name + ": 오류(" + s + ")" + (d ? " — " + d : "");
+  }
+
+  /* ---------- 회의 실행 ---------- */
+  function sleep(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
+  function agendaValue(){ return String($("agendaIn").value || "").trim(); }
+
+  async function startRound(round){
+    if(meet.running) return;
+    var agenda = agendaValue();
+    if(round === 1 && !agenda){
+      toast("대표님 안건을 먼저 적어 주세요", { error:true, duration:2600 });
+      try{ $("agendaIn").focus(); }catch(e){}
+      return;
+    }
+    if(round === 2 && !meet.msgs.some(function(m){ return m.kind === "ai" && m.round === 1; })){
+      toast("먼저 1라운드를 진행해 주세요", { error:true });
+      return;
+    }
+    var actives = activeAIs();
+    if(!actives.length){
+      setKeyPanel(true);
+      var anyKey = AIS.some(hasKey);
+      toast(anyKey ? "🔑 참여로 켜 둔 AI가 없습니다 — ‘이번 회의 참여’를 켜 주세요"
+                   : "🔑 AI API 키를 먼저 넣어 주세요 — 키가 있는 AI만으로도 회의할 수 있습니다",
+            { error:true, duration:4200 });
+      if(!anyKey){ try{ $("key-anthropic").focus(); }catch(e){} }
+      return;
+    }
+    meet.agenda = agenda || meet.agenda;
+    meet.run = (meet.run || 0) + 1;
+    meet.round = Math.max(meet.round || 0, round);
+    if(round === 1){
+      meet.msgs.push({ id:uid(), kind:"user", text:agenda, round:1, run:meet.run, at:Date.now() });
+      meet.round = 1;
+      saveMeet(); renderChat(); renderMeetStats(); syncButtons();
+    }
+    await runRound(round, actives);
+  }
+
+  async function runRound(round, actives){
+    meet.running = true; syncButtons();
+    setMeetState(round + "라운드 진행 중…");
+    var run = meet.run;
+    var okCount = 0;
+    for(var i = 0; i < actives.length; i++){
+      var ai = actives[i];
+      meet.typing = ai.id;
+      setMeetState(ai.name + " 생각 중… (" + (i + 1) + "/" + actives.length + ")");
+      renderChat();
+      var text = null, err = null;
+      try{
+        text = await callAI(ai, systemPrompt(ai, round), userPrompt(ai, round, meet.agenda, contextFor(round, run)));
+      }catch(e){ err = e; }
+      meet.typing = null;
+      if(text){
+        meet.msgs.push({ id:uid(), kind:"ai", who:ai.id, text:text, round:round, run:run, at:Date.now() });
+        okCount++;
+      } else {
+        meet.msgs.push({ id:uid(), kind:"err", who:ai.id, text:koError(ai, err), round:round, run:run, at:Date.now() });
+      }
+      saveMeet(); renderChat(); renderMeetStats();
+      if(i < actives.length - 1) await sleep(140);
+    }
+    meet.typing = null;
+    if(okCount > 0){
+      addPickleSummary(round, run);
+      setMeetState("피클 요약 정리 중…");
+      flashSeat("pickle", 1800);
+    }
+    meet.running = false;
+    syncButtons();
+    setMeetState(round === 1 ? "1라운드 완료" : "2라운드 완료 · 1위 확정");
+    toast(okCount ? ("✅ " + round + "라운드 완료 · AI " + okCount + "명 발언")
+                  : "모든 AI 호출이 실패했습니다 — 키·모델을 확인하세요",
+          { error: !okCount, duration: 2600 });
+    if(okCount > 0) renderMeetStats();
+  }
+
+  function addPickleSummary(round, run){
+    var aiMsgs = meet.msgs.filter(function(m){ return m.kind === "ai" && m.round === round && m.run === run; });
+    if(!aiMsgs.length) return;
+    var items = [], winner = "";
+    aiMsgs.forEach(function(m){
+      var text = String(m.text).replace(/\*\*/g, "");
+      if(!winner){
+        var wm = text.match(/1위[^\n:：]{0,10}[:：]?\s*["'“「]?([^\n"'”」,，]{2,40})/);
+        if(wm) winner = wm[1].replace(/\s*[-–—].*$/, "").trim().replace(/[.。]$/, "");
+      }
+      text.split(/\n+/).forEach(function(raw){
+        var line = raw.replace(/^[\s\-•*·①-⑳]+/, "").replace(/^\d+[).]\s*/, "").trim();
+        if(line.length < 10 || items.length >= 5) return;
+        if(/실행|시작|만들|올리|등록|배포|문의|연락|발행|검증|세팅|판매|모집|노출|정하/.test(line) ||
+           /^(1~2일|3~4일|5~7일|D\+?\d)/.test(line)){
+          if(items.indexOf(line) < 0) items.push(line.slice(0, 110));
+        }
+      });
+    });
+    if(!items.length){
+      aiMsgs.forEach(function(m){
+        var l = (String(m.text).split("\n")[0] || "").trim();
+        if(l && items.length < 4) items.push(AI_BY[m.who].name + ": " + l.slice(0, 90));
+      });
+    }
+    items = items.slice(0, 5);
+    var names = aiMsgs.map(function(m){ return AI_BY[m.who].name; }).join(" · ");
+    var title = round === 1
+      ? "안건: " + String(meet.agenda || "").slice(0, 90)
+      : "최종 1위: " + (winner || "각 AI의 1위 후보 확인 필요");
+    var head = round === 1 ? "실행 체크리스트" : "1위 확정 · 7일 실행안";
+    var body = title + "\n" + items.map(function(t){ return "- " + t; }).join("\n");
+    var copy = [
+      "🥒 [피클에게 넘기는 실행 요약 · Sond-office 단체회의]",
+      "· 일시: " + new Date().toLocaleString("ko-KR"),
+      "· 회의: " + round + "라운드 · 참석 " + names,
+      "· " + title,
+      head + ":",
+      items.map(function(t){ return "  - " + t; }).join("\n"),
+      "· 회의록 원본: " + DRIVE_URL + " (01_회의실_안건·회의록)"
+    ].join("\n");
+    meet.msgs.push({ id:uid(), kind:"pickle", round:round, run:run, title:title, head:head,
+                     items:items, text:body, copyText:copy, at:Date.now() });
+    saveMeet(); renderChat(); renderMeetStats();
+  }
+
+  function addFromMessage(m){
+    var ai = AI_BY[m.who] || { name:"AI" };
+    var clean = String(m.text).replace(/\*\*/g, "");
+    var lines = clean.split(/\n+/).map(function(s){
+      return s.replace(/^[\s\-•*·①-⑳]+/, "").replace(/^\d+[).]\s*/, "").trim();
+    }).filter(Boolean);
+    var title = "";
+    var wm = clean.match(/1위[^\n:：]{0,10}[:：]?\s*["'“「]?([^\n"'”」,，]{2,40})/);
+    if(wm) title = wm[1].trim();
+    if(!title){
+      for(var i = 0; i < lines.length; i++){
+        var l = lines[i];
+        if(l.length >= 6 && l.length <= 46 && !/[:：]$/.test(l) && !/^(내 판단|근거|실행|요약|결론)/.test(l)){ title = l; break; }
+      }
+    }
+    if(!title) title = (lines[0] || "AI 제안").slice(0, 46);
+    if(title.length > 46) title = title.slice(0, 44) + "…";
+
+    var rev = "", risk = "";
+    for(var j = 0; j < lines.length; j++){
+      if(!rev && /7일|매출|단가|만원|원\b/.test(lines[j]) && lines[j].length <= 110) rev = lines[j];
+      if(!risk && /리스크|약점|반박|위험/.test(lines[j]) && lines[j].length <= 110) risk = lines[j];
+    }
+    if(state.candidates.some(function(c){ return c.name === title; })){
+      toast("이미 사업후보에 있습니다: " + title.slice(0, 20), { actionLabel:"보기",
+        onAction:function(){ showPane("cands"); }, duration:3600 });
+      return;
+    }
+    state.candidates.push({
+      id: uid(), name: title, target: ai.name + " · " + m.round + "라운드 발언",
+      revenue: rev, risk: risk, status:"검토중", createdAt: Date.now()
+    });
+    save(); renderCandidates(); renderKpis();
+    toast("📊 사업후보에 추가: " + title.slice(0, 22), { actionLabel:"보기",
+      onAction:function(){ showPane("cands"); }, duration:4200 });
+  }
+
+  function buildMinutes(){
+    var out = [];
+    out.push("🏢 Sond-office · AI 단체 회의록");
+    out.push("일시: " + new Date().toLocaleString("ko-KR"));
+    out.push("안건: " + (meet.agenda || "-"));
+    out.push("참석: " + (activeAIs().map(function(a){ return a.name + "(" + modelOf(a) + ")"; }).join(" · ") || "-"));
+    out.push("원본 보관: " + DRIVE_URL + " (01_회의실_안건·회의록)");
+    out.push("");
+    meet.msgs.forEach(function(m){
+      if(m.kind === "user"){ out.push("[👑 손성훈 대표 · 안건]", m.text, ""); return; }
+      if(m.kind === "ai"){ out.push("[" + AI_BY[m.who].name + " · " + AI_BY[m.who].role + " · " + m.round + "라운드]", m.text, ""); return; }
+      if(m.kind === "err"){ out.push("[" + ((AI_BY[m.who] || {}).name || m.who) + " · 오류]", m.text, ""); return; }
+      if(m.kind === "pickle"){ out.push("[🥒 피클 · 총괄 운영실장 요약 · " + m.round + "라운드]", m.text || "", ""); return; }
+    });
+    return out.join("\n").replace(/\n{4,}/g, "\n\n\n").trim() + "\n";
+  }
+
+  function renderChips(){
+    var host = $("exChips");
+    host.innerHTML = "";
+    [ "무인 AI 디지털 상품 회사로 갈 건데 수익 모델 1개만 정해줘",
+      "첫 달 현금흐름 100만원 — 뭘 먼저 팔아야 해?",
+      "가전 견적·컨설팅 웹앱을 7일 안에 유료화하는 안" ].forEach(function(t){
+      var b = el("button", "chip-ex", t);
+      b.type = "button";
+      b.addEventListener("click", function(){
+        $("agendaIn").value = t;
+        meet.agenda = t; saveMeet();
+        try{ $("agendaIn").focus(); }catch(e){}
+      });
+      host.appendChild(b);
+    });
+  }
+
+  $("keyToggle").addEventListener("click", function(){ setKeyPanel($("keyPanel").hidden); });
+  $("clearKeys").addEventListener("click", function(){
+    if(!AIS.some(hasKey)){ toast("저장된 키가 없습니다", { error:true }); return; }
+    var snap = {};
+    AIS.forEach(function(a){ snap[a.id] = keyStore[a.id].key; });
+    AIS.forEach(function(a){ keyStore[a.id].key = ""; });
+    saveKeyStore(); renderKeyPanel(); renderMeetWho(); syncButtons();
+    toast("🔑 저장된 키를 지웠습니다", { actionLabel:"되돌리기", duration:5000, onAction:function(){
+      AIS.forEach(function(a){ keyStore[a.id].key = snap[a.id]; });
+      saveKeyStore(); renderKeyPanel(); renderMeetWho(); syncButtons();
+    } });
+  });
+  $("startRound1").addEventListener("click", function(){ startRound(1); });
+  $("startRound2").addEventListener("click", function(){ startRound(2); });
+  $("copyMinutes").addEventListener("click", function(){
+    if(!meet.msgs.length){ toast("회의록이 비어 있습니다", { error:true }); return; }
+    copyWithToast(buildMinutes(), "전체 회의록 복사 완료 (드라이브 바로가기 포함)");
+  });
+  $("clearChat").addEventListener("click", function(){
+    if(!meet.msgs.length){ toast("비울 대화가 없습니다", { error:true }); return; }
+    var snap = meet.msgs.slice();
+    var runSnap = meet.run, roundSnap = meet.round;
+    meet.msgs = []; meet.typing = null; meet.round = 0;
+    saveMeet(); renderChat(); renderMeetStats(); syncButtons(); setMeetState("대기 중");
+    toast("🗑 대화를 비웠습니다", { actionLabel:"되돌리기", duration:5000, onAction:function(){
+      meet.msgs = snap; meet.round = roundSnap; meet.run = runSnap;
+      saveMeet(); renderChat(); renderMeetStats(); syncButtons();
+    } });
+  });
+
+  var agendaDeb = null;
+  $("agendaIn").addEventListener("input", function(){
+    clearTimeout(agendaDeb);
+    agendaDeb = setTimeout(function(){ meet.agenda = agendaValue(); saveMeet(); }, 400);
+  });
+
   /* ================= boot ================= */
   load();
   renderExecs();
@@ -1029,12 +2011,34 @@
   memo.value = state.memo;
   memoStat();
 
+  // 단체회의
+  loadKeyStore();
+  renderKeyPanel();
+  renderMeetWho();
+  renderChips();
+  renderSeats();
+  loadMeet();
+  renderChat();
+  renderMeetStats();
+  syncButtons();
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-goto]"), function(b){
+    b.addEventListener("click", function(){ showPane(b.getAttribute("data-goto")); });
+  });
+
   // expose a tiny read-only hook for automated checks (no secrets, no writes)
   window.__office = {
-    version: 1,
+    version: 2,
     counts: function(){
       return { candidates: state.candidates.length, agenda: state.agenda.length,
                top: state.candidates.filter(function(c){ return c.status === "1순위"; }).length };
+    },
+    meeting: function(){
+      return { msgs: meet.msgs.length, round: meet.round, running: meet.running,
+               keys: AIS.filter(hasKey).length,
+               joined: activeAIs().map(function(a){ return a.id; }),
+               bubbles: document.querySelectorAll("#chat .msg").length,
+               pickleCards: document.querySelectorAll("#chat .pickle").length };
     }
   };
 })();
