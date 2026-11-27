@@ -328,12 +328,28 @@
   }
   .badge.on{color:var(--teal);border-color:rgba(72,201,176,.45);background:var(--teal-soft)}
   .aikey .row-in{display:grid;grid-template-columns:minmax(0,1fr) 132px;gap:7px;min-width:0}
-  .aikey input[type=password]{
+  .aikey .keywrap{position:relative;display:flex;align-items:center;min-width:0}
+  .aikey input.keyin{
     width:100%;min-width:0;background:#0b1020;border:1px solid var(--line2);border-radius:10px;
-    padding:9px 10px;font-size:12.5px;outline:none;color:var(--text);letter-spacing:.02em;
+    padding:9px 34px 9px 10px;font-size:12.5px;outline:none;color:var(--text);letter-spacing:.02em;
   }
-  .aikey input[type=password]::placeholder{color:#5b6780;letter-spacing:0}
-  .aikey input[type=password]:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,181,68,.14)}
+  .aikey input.keyin::placeholder{color:#5b6780;letter-spacing:0}
+  .aikey input.keyin:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,181,68,.14)}
+  .aikey .eye{
+    position:absolute;right:4px;top:50%;transform:translateY(-50%);width:26px;height:26px;
+    display:grid;place-items:center;padding:0;border:1px solid transparent;border-radius:8px;
+    background:transparent;color:var(--muted);font-size:13px;line-height:1;cursor:pointer;
+  }
+  .aikey .eye:hover,.aikey .eye[aria-pressed="true"]{background:#1a2233;color:var(--text)}
+  .aikey .keymeta{
+    font-size:10.5px;line-height:1.5;color:var(--muted2);letter-spacing:0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere;
+    display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:-2px;
+  }
+  .aikey .keymeta .kk{color:var(--teal);font-weight:800}
+  .aikey .keymeta .n{color:var(--muted)}
+  .aikey .keymeta .warn{color:var(--gold);font-weight:700}
+  .aikey .keymeta .bad{color:#f0846f;font-weight:700}
   .aikey select{font-size:12px;padding:9px 26px 9px 9px;background-position:calc(100% - 13px) 16px,calc(100% - 8px) 16px}
   .toggle{
     display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--muted);
@@ -626,7 +642,7 @@
       </button>
       <div id="keyPanel" hidden>
         <div class="keygrid" id="keyGrid"></div>
-        <p class="tiny" style="margin:10px 2px 0">키는 내 브라우저(<b style="color:#c3cddf">localStorage</b>)에만 저장되며 외부 서버나 GitHub에 올라가지 않습니다. 이 기기에서 각 AI사 API로 직접 호출합니다.</p>
+        <p class="tiny" style="margin:10px 2px 0">키는 내 브라우저(<b style="color:#c3cddf">localStorage</b>)에만 저장되며 외부 서버나 GitHub에 올라가지 않습니다. 이 기기에서 각 AI사 API로 직접 호출합니다. 입력칸 오른쪽 <b style="color:#c3cddf">👁️</b>로 키를 확인하고, 아래 미리보기(앞 8자·끝 4자·글자 수)로 제대로 붙여넣었는지 보세요 — 공백·줄바꿈·보이지 않는 문자는 자동으로 정리됩니다.</p>
         <div class="row" style="margin-top:9px">
           <button class="btn sm danger" type="button" id="clearKeys">저장된 키 모두 지우기</button>
         </div>
@@ -1316,8 +1332,8 @@
       persona:"너는 1인 AI 회사의 전략기획·딥리서치 팀장이다. 시장 규모·경쟁사·수익을 숫자로 검증하고 다른 의견의 허점을 지적한다. 확인되지 않은 숫자는 '추정'이라고 밝힌다." },
     { id:"google", name:"제미나이", emoji:"🎬", role:"미디어 · 대량 자동화",
       keyHint:"AIza... (Google AI Studio 키)",
-      models:[{ v:"gemini-2.5-flash", label:"gemini-2.5-flash (기본)" },
-              { v:"gemini-2.0-flash", label:"gemini-2.0-flash (폴백)" }],
+      models:[{ v:"gemini-3.8-flash", label:"gemini-3.8-flash (기본)" },
+              { v:"gemini-flash-lite-latest", label:"gemini-flash-lite-latest (폴백·저렴)" }],
       persona:"너는 1인 AI 회사의 미디어·대량 자동화 실무자다. 트렌드 수집, 콘텐츠 대량 생산, 모니터링 자동화 관점에서 답하고, 오늘 바로 돌릴 수 있는 자동화 단계로 쪼갠다." }
   ];
   var AI_BY = {};
@@ -1328,7 +1344,32 @@
 
   var meet = { msgs:[], round:0, run:0, agenda:"", typing:null, running:false };
 
-  function hasKey(ai){ return !!(keyStore[ai.id] && String(keyStore[ai.id].key || "").trim()); }
+  /* ---------- API 키 정리·미리보기 ---------- */
+  var GEMINI_FALLBACK = "gemini-flash-lite-latest";
+  /* 공백·줄바꿈·NBSP·제로폭·BOM 등 눈에 보이지 않는 문자는 전부 제거한다. */
+  var INVISIBLE = /[\u0000-\u0020\u007f-\u009f\u00a0\u1680\u2000-\u200f\u2028\u2029\u202f\u205f\u2060\u3000\ufeff]/g;
+  function cleanKey(v){
+    var s = String(v == null ? "" : v);
+    s = s.replace(/^\s*(?:authorization|x-api-key|api[-_]?key|[A-Za-z]{1,8}-api-key)\s*[:=]\s*/i, "");
+    s = s.replace(/^\s*bearer\s+/i, "");
+    s = s.replace(INVISIBLE, "");
+    s = s.replace(/^["'`]+|["'`]+$/g, "");
+    return s.trim();
+  }
+  function maskKey(raw){
+    var s = cleanKey(raw);
+    if(!s) return "";
+    if(s.length <= 10) return s.slice(0, 3) + "…" + s.slice(-2);
+    return s.slice(0, 8) + "…" + s.slice(-4);
+  }
+  function strippedCount(raw){
+    var s = String(raw == null ? "" : raw);
+    var cleaned = cleanKey(s);
+    return Math.max(0, s.replace(/^[\s"'`]+|[\s"'`]+$/g, "").length - cleaned.length);
+  }
+  function keyLen(raw){ return cleanKey(raw).length; }
+
+  function hasKey(ai){ return keyLen(keyStore[ai.id] && keyStore[ai.id].key) > 0; }
   function modelOf(ai){
     var m = keyStore[ai.id] ? keyStore[ai.id].model : "";
     for(var i = 0; i < ai.models.length; i++){ if(ai.models[i].v === m) return m; }
@@ -1412,8 +1453,10 @@
       var d = JSON.parse(localStorage.getItem(KEYS_KEY) || "{}") || {};
       AIS.forEach(function(a){
         var r = (d && d[a.id]) || {};
+        var model = typeof r.model === "string" ? r.model : a.models[0].v;
+        var valid = a.models.some(function(m){ return m.v === model; });
         keyStore[a.id] = { key: typeof r.key === "string" ? r.key : "",
-                           model: typeof r.model === "string" ? r.model : a.models[0].v };
+                           model: valid ? model : a.models[0].v };
         joinStore[a.id] = r.join === false ? false : true;
       });
     }catch(e){ /* ignore broken store */ }
@@ -1455,22 +1498,69 @@
       box.appendChild(top);
 
       var row = el("div", "row-in");
+      var wrap = el("div", "keywrap");
       var inp = document.createElement("input");
-      inp.type = "password"; inp.id = "key-" + ai.id;
+      inp.type = "password"; inp.id = "key-" + ai.id; inp.className = "keyin";
       inp.value = rec.key;
       inp.placeholder = ai.keyHint;
       inp.setAttribute("aria-label", ai.name + " API 키");
       inp.setAttribute("autocomplete", "off");
       inp.setAttribute("spellcheck", "false");
+
+      var meta = el("div", "keymeta");
+      meta.id = "keymeta-" + ai.id;
+      function paintMeta(){
+        meta.innerHTML = "";
+        var raw = String(rec.key == null ? "" : rec.key);
+        var len = keyLen(raw);
+        var hidden = Math.max(0, raw.length - cleanKey(raw).length);
+        if(!len){
+          if(raw.length) meta.appendChild(el("span", "bad", "⚠ 공백·보이지 않는 문자만 들어 있습니다 — 키를 다시 붙여넣으세요"));
+          else meta.appendChild(el("span", "n", "붙여넣으면 앞 8자·끝 4자와 글자 수가 표시됩니다"));
+          return;
+        }
+        meta.appendChild(el("span", "kk", maskKey(raw)));
+        meta.appendChild(el("span", "n", len + "자"));
+        if(hidden > 0) meta.appendChild(el("span", "warn", "· 숨은 공백·줄바꿈 " + hidden + "자 제거해 호출"));
+        if(len < 40) meta.appendChild(el("span", "warn", "· 짧음(보통 100자 전후)"));
+      }
+
+      var eye = document.createElement("button");
+      eye.type = "button"; eye.className = "eye";
+      eye.textContent = "👁️";
+      eye.setAttribute("aria-label", ai.name + " 키 보기");
+      eye.setAttribute("aria-pressed", "false");
+      eye.setAttribute("title", "키 보기 / 숨기기");
+      eye.addEventListener("click", function(){
+        var showing = inp.type === "text";
+        inp.type = showing ? "password" : "text";
+        eye.textContent = showing ? "👁️" : "🙈";
+        eye.setAttribute("aria-pressed", showing ? "false" : "true");
+        eye.setAttribute("aria-label", ai.name + (showing ? " 키 보기" : " 키 숨기기"));
+      });
+
       var deb = null;
       inp.addEventListener("input", function(){
         rec.key = inp.value;
         if(hasKey(ai)){ badge.textContent = "연결됨(키 있음)"; badge.classList.add("on"); }
         else { badge.textContent = "미입력"; badge.classList.remove("on"); }
+        paintMeta();
         clearTimeout(deb);
         deb = setTimeout(function(){ saveKeyStore(); renderMeetWho(); syncButtons(); renderKeySummary(); }, 400);
       });
-      row.appendChild(inp);
+      inp.addEventListener("blur", function(){
+        var raw = inp.value, cl = cleanKey(raw);
+        if(cl === raw) return;
+        inp.value = cl; rec.key = cl;
+        if(hasKey(ai)){ badge.textContent = "연결됨(키 있음)"; badge.classList.add("on"); }
+        else { badge.textContent = "미입력"; badge.classList.remove("on"); }
+        paintMeta(); saveKeyStore(); renderMeetWho(); syncButtons(); renderKeySummary();
+        toast("🧹 " + ai.name + " 키에서 공백·줄바꿈·보이지 않는 문자를 정리했습니다");
+      });
+
+      wrap.appendChild(inp);
+      wrap.appendChild(eye);
+      row.appendChild(wrap);
 
       var sel = document.createElement("select");
       sel.id = "model-" + ai.id;
@@ -1484,6 +1574,8 @@
       sel.addEventListener("change", function(){ rec.model = sel.value; saveKeyStore(); });
       row.appendChild(sel);
       box.appendChild(row);
+      box.appendChild(meta);
+      paintMeta();
       host.appendChild(box);
     });
     renderKeySummary();
@@ -1708,7 +1800,7 @@
                                       system:system, messages:[{ role:"user", content:user }] }) };
     } else if(ai.id === "openai"){
       url = "https://api.openai.com/v1/chat/completions";
-      opts = { method:"POST", headers:{ "content-type":"application/json", "authorization":"Bearer " + key },
+      opts = { method:"POST", headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + key },
                body: JSON.stringify({ model:model, max_tokens:1200, temperature:0.7,
                                       messages:[{ role:"system", content:system }, { role:"user", content:user }] }) };
     } else {
@@ -1749,15 +1841,19 @@
   }
 
   function callAI(ai, system, user){
-    var key = String((keyStore[ai.id] && keyStore[ai.id].key) || "").trim();
+    var raw = String((keyStore[ai.id] && keyStore[ai.id].key) || "");
+    var key = cleanKey(raw);
     if(!key){
-      var e = new Error("no key"); e.code = "no_key";
+      var e = new Error("no key"); e.code = raw.trim() ? "blank_key" : "no_key";
       return Promise.reject(e);
     }
     var primary = modelOf(ai);
     return requestOnce(ai, primary, key, system, user).catch(function(err){
-      if(ai.id === "google" && primary !== "gemini-2.0-flash" && (err.status === 404 || err.status === 400)){
-        return requestOnce(ai, "gemini-2.0-flash", key, system, user);
+      if(ai.id === "google" && primary !== GEMINI_FALLBACK && (err.status === 404 || err.status === 400)){
+        return requestOnce(ai, GEMINI_FALLBACK, key, system, user).catch(function(err2){
+          err2.fallbackTried = GEMINI_FALLBACK;
+          throw err2;
+        });
       }
       throw err;
     });
@@ -1766,12 +1862,23 @@
   function koError(ai, err){
     err = err || {};
     if(err.code === "no_key") return "🔑 " + ai.name + " API 키가 없습니다 — 위 ‘AI API 키 설정’에서 입력하세요.";
+    if(err.code === "blank_key") return "🔑 " + ai.name + " 키가 공백·줄바꿈뿐입니다 — 키를 다시 복사해 붙여넣으세요.";
     if(err.name === "AbortError") return "⏱ " + ai.name + " 응답이 70초를 넘어 중단했습니다. 다시 시도하세요.";
     var s = err.status;
-    var d = err.detail ? String(err.detail).slice(0, 120) : "";
-    if(s === 401 || s === 403) return "🔒 " + ai.name + ": API 키가 올바르지 않거나 권한이 없습니다(" + s + "). 키를 다시 확인하세요.";
-    if(s === 429) return "💳 " + ai.name + ": 요청·크레딧 한도를 초과했습니다(429). 잠시 뒤 다시 시도하거나 결제·한도를 확인하세요.";
-    if(s === 400 || s === 404) return "⚙️ " + ai.name + ": 요청이 거절되었습니다(" + s + "). 모델명을 확인하세요." + (d ? " — " + d : "");
+    var d = err.detail ? String(err.detail).slice(0, 200) : "";
+    var low = d.toLowerCase();
+    if(s === 401 || s === 403){
+      var hint = "";
+      if(/credit balance|billing|insufficient|quota|exceeded/.test(low)) hint = " (크레딧·결제 잔액 부족 가능성)";
+      else if(/invalid x-api-key|incorrect api key|api key not valid|invalid api key|api_key_invalid/.test(low)) hint = " (키 값이 틀렸거나 폐기됨 — 다시 복사)";
+      else if(/permission|not authorized|not allowed|disabled|restricted/.test(low)) hint = " (권한·API 사용 설정 확인)";
+      return "🔒 " + ai.name + ": 키가 거절되었습니다(" + s + ")" + (d ? " — " + d : "") + hint +
+             " · 입력칸 미리보기(앞 8자/끝 4자)가 실제 키와 같은지 확인하세요.";
+    }
+    if(s === 429) return "💳 " + ai.name + ": 요청·크레딧 한도를 초과했습니다(429)" + (d ? " — " + d : "") +
+      ". 잠시 뒤 다시 시도하거나 결제·한도를 확인하세요.";
+    if(s === 400 || s === 404) return "⚙️ " + ai.name + ": 요청이 거절되었습니다(" + s + ")" +
+      (d ? " — " + d : "") + (err.fallbackTried ? " (폴백 " + err.fallbackTried + "도 실패)" : "");
     if(s === 502) return "⚠️ " + ai.name + ": 응답을 받지 못했습니다." + (d ? " — " + d : "");
     if(!s) return "🌐 " + ai.name + ": 브라우저에서 직접 호출이 막혔거나 네트워크 오류입니다(CORS·연결). 키와 인터넷 연결을 확인하세요." + (d ? " — " + d : "");
     return "⚠️ " + ai.name + ": 오류(" + s + ")" + (d ? " — " + d : "");
@@ -2050,6 +2157,13 @@
                joined: activeAIs().map(function(a){ return a.id; }),
                bubbles: document.querySelectorAll("#chat .msg").length,
                pickleCards: document.querySelectorAll("#chat .pickle").length };
+    },
+    models: function(){
+      return AIS.map(function(a){ return { id:a.id, model:modelOf(a), options:a.models.map(function(m){ return m.v; }) }; });
+    },
+    keyState: function(){
+      return AIS.map(function(a){ var raw = keyStore[a.id].key;
+        return { id:a.id, mask:maskKey(raw), len:keyLen(raw), rawLen:String(raw).length }; });
     }
   };
 })();
