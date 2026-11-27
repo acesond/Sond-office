@@ -1420,6 +1420,17 @@
   }
   function keyLen(raw){ return cleanKey(raw).length; }
 
+  /* 키 정리 안내는 여러 칸에서 겹치지 않게 한 번로 묶어서 보여준다. */
+  var keyCleanTimer = null, keyCleanNames = [];
+  function notifyKeyCleaned(name){
+    if(keyCleanNames.indexOf(name) < 0) keyCleanNames.push(name);
+    if(keyCleanTimer) clearTimeout(keyCleanTimer);
+    keyCleanTimer = setTimeout(function(){
+      var names = keyCleanNames.slice(); keyCleanNames = [];
+      toast("🧹 " + names.join("·") + " 키에서 공백·줄바꿈·보이지 않는 문자를 정리했습니다");
+    }, 500);
+  }
+
   function hasKey(ai){ return keyLen(keyStore[ai.id] && keyStore[ai.id].key) > 0; }
   function modelOf(ai){
     var m = keyStore[ai.id] ? keyStore[ai.id].model : "";
@@ -1617,7 +1628,7 @@
         if(hasKey(ai)){ badge.textContent = "연결됨(키 있음)"; badge.classList.add("on"); }
         else { badge.textContent = "미입력"; badge.classList.remove("on"); }
         paintMeta(); saveKeyStore(); renderMeetWho(); syncButtons(); renderKeySummary();
-        toast("🧹 " + ai.name + " 키에서 공백·줄바꿈·보이지 않는 문자를 정리했습니다");
+        notifyKeyCleaned(ai.name);
       });
 
       wrap.appendChild(inp);
