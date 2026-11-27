@@ -2294,7 +2294,8 @@
     return e;
   }
 
-  function requestOnce(ai, model, key, system, user){
+  /* noTemp: 모델이 temperature를 거부한다는 400을 받았을 때 true로 다시 부른다(자동 재시도용) */
+  function requestOnce(ai, model, key, system, user, noTemp){
     var ctrl = null, timer = null;
     try{ ctrl = new AbortController(); timer = setTimeout(function(){ ctrl.abort(); }, 70000); }catch(e){ ctrl = null; }
     var url, opts;
@@ -2308,7 +2309,8 @@
                  "x-api-key":key,
                  "anthropic-version":"2023-06-01",
                  "anthropic-dangerous-direct-browser-access":"true" },
-               body: JSON.stringify({ model:model, max_tokens:1200, temperature:0.7,
+               /* 최신 클로드(Sonnet 4.5 등)는 temperature를 거부한다(400 deprecated) — 기본적으로 보내지 않는다 */
+               body: JSON.stringify({ model:model, max_tokens:1200,
                                       system:system, messages:[{ role:"user", content:user }] }) };
     } else if(ai.id === "openai"){
       url = "https://api.openai.com/v1/chat/completions";
@@ -2318,8 +2320,11 @@
       var oa = reasoning
         ? { model:model, max_completion_tokens:3000,
             messages:[{ role:"developer", content:system }, { role:"user", content:user }] }
-        : { model:model, max_tokens:1200, temperature:0.7,
-            messages:[{ role:"system", content:system }, { role:"user", content:user }] };
+        : (noTemp
+            ? { model:model, max_tokens:1200,
+                messages:[{ role:"system", content:system }, { role:"user", content:user }] }
+            : { model:model, max_tokens:1200, temperature:0.7,
+                messages:[{ role:"system", content:system }, { role:"user", content:user }] });
       opts = { method:"POST", headers:{ "Content-Type":"application/json", "Authorization":"Bearer " + key },
                body: JSON.stringify(oa) };
     } else {
@@ -2347,6 +2352,10 @@
         if(!res.ok){
           var det = txt;
           try{ var j = JSON.parse(txt); det = (j.error && (j.error.message || j.error.status || j.error.code)) || txt; }catch(e){}
+          /* 안전망: 모델이 temperature를 거부하면(400 … temperature …) 빼고 1회만 자동 재시도 */
+          if(!noTemp && res.status === 400 && /temperature/i.test(String(det))){
+            return requestOnce(ai, model, key, system, user, true);
+          }
           throw httpError(res.status, det);
         }
         var d;
@@ -2459,7 +2468,9 @@
       ". 잠시 뒤 다시 시도하세요." +
       (err.fallbackTried ? " (폴백 " + err.fallbackTried + "도 실패)" : "");
     if(s === 400 || s === 404) return "⚙️ " + ai.name + ": 요청이 거절되었습니다(" + s + ")" +
-      (d ? " — " + d : "") + (err.fallbackTried ? " (폴백 " + err.fallbackTried + "도 실패)" : "");
+      (d ? " — " + d : "") +
+      (s === 400 && /temperature/i.test(d) ? " (temperature 없이 자동 재시도했습니다)" : "") +
+      (err.fallbackTried ? " (폴백 " + err.fallbackTried + "도 실패)" : "");
     if(s === 502) return "⚠️ " + ai.name + ": 응답을 받지 못했습니다." + (d ? " — " + d : "");
     if(!s) return "🌐 " + ai.name + ": 브라우저에서 직접 호출이 막혔거나 네트워크 오류입니다(CORS·연결). 키와 인터넷 연결을 확인하세요." + (d ? " — " + d : "");
     return "⚠️ " + ai.name + ": 오류(" + s + ")" + (d ? " — " + d : "");
