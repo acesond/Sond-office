@@ -152,6 +152,26 @@
   }
   .cr-st i{width:4.5px;height:4.5px;border-radius:50%;background:var(--green);flex:0 0 auto}
   .cr-st.wait i{background:#E0A33A}
+  /* 피클별 일감 수 + 한도 여유 배지 */
+  .cr-load{
+    display:flex;align-items:center;gap:3px;justify-content:center;
+    font-size:9.3px;font-weight:750;color:#6B6779;line-height:1.25;
+    white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis;
+  }
+  .cr-load i{width:4.5px;height:4.5px;border-radius:50%;background:var(--green);flex:0 0 auto}
+  .cr-load.wait i{background:#E0A33A}
+  .cr-q{
+    display:inline-flex;align-items:center;justify-content:center;
+    max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    font-size:9.2px;font-weight:800;letter-spacing:-.02em;line-height:1.5;
+    border-radius:999px;padding:0 6px;border:1px solid transparent;
+    margin-top:1px;
+  }
+  .cr-q.q-free{background:#E4F6EC;border-color:#C6EAD7;color:#0B7A3F}
+  .cr-q.q-normal{background:#FDF0DC;border-color:#F0DFAF;color:#8A5B09}
+  .cr-q.q-low{background:#FBE7E7;border-color:#F3C9C9;color:#A82F2F}
+  .critter.auto .cr-q{box-shadow:0 0 0 2px rgba(108,77,255,.30)}
+  .critter.auto .cr-name{color:var(--violet-deep)}
 
   /* blink & life */
   .pav .eyes{transform-box:fill-box;transform-origin:center;animation:blink 5.6s infinite}
@@ -399,6 +419,8 @@
   .cmp-hint b{color:var(--violet-deep);font-weight:800}
   .cmp-hint .ok{color:var(--green);font-weight:800}
   .cmp-hint .bad{color:#B23B3B;font-weight:800}
+  .cmp-hint.multi{display:block;white-space:normal;line-height:1.45;padding:1px 6px 0;word-break:keep-all;overflow-wrap:normal;min-height:0}
+  .cmp-hint.multi b{white-space:nowrap}
 
   /* ================= sheet ================= */
   .veil{
@@ -448,6 +470,33 @@
   }
   .kv dt{color:var(--muted);font-weight:700}
   .kv dd{margin:0;font-weight:750;color:#33303F;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+
+  /* 한도 여유 설정 */
+  .qset{background:#F8F7FD;border:1px solid var(--line);border-radius:14px;padding:11px 12px 12px}
+  .qbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .qbtn{
+    border:1px solid var(--line2);background:var(--surface);color:#4A4658;
+    border-radius:11px;padding:8px 4px;font-size:12px;font-weight:800;min-height:40px;
+    transition:transform .12s, box-shadow .12s, background .12s, border-color .12s;
+  }
+  .qbtn:active{transform:scale(.97)}
+  .qbtn[data-q="free"].on{background:#E4F6EC;border-color:#A9DEC4;color:#0B7A3F;box-shadow:0 0 0 2px rgba(18,160,92,.12)}
+  .qbtn[data-q="normal"].on{background:#FDF0DC;border-color:#EBCF9C;color:#8A5B09;box-shadow:0 0 0 2px rgba(201,138,24,.12)}
+  .qbtn[data-q="low"].on{background:#FBE7E7;border-color:#EFBEBE;color:#A82F2F;box-shadow:0 0 0 2px rgba(178,59,59,.12)}
+  .qrow{display:flex;align-items:center;gap:8px;margin-top:10px}
+  .qrow label{flex:1 1 auto;font-size:11px;font-weight:800;color:var(--muted);line-height:1.35}
+  .qrow label span{font-weight:700;color:var(--muted2)}
+  .qiwrap{position:relative;flex:0 0 auto;display:flex;align-items:center}
+  #qPct{
+    width:86px;border:1px solid var(--line2);border-radius:10px;background:var(--surface);
+    padding:8px 24px 8px 10px;font-size:12.4px;font-weight:800;text-align:right;
+    -moz-appearance:textfield;appearance:textfield;
+  }
+  #qPct::-webkit-outer-spin-button,#qPct::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  #qPct:focus{outline:none;border-color:var(--violet-line);box-shadow:0 0 0 3px rgba(108,77,255,.10)}
+  .qsuf{position:absolute;right:9px;font-size:11px;font-weight:800;color:var(--muted2);pointer-events:none}
+  .qnow{margin-top:9px;font-size:10.8px;color:#6D6879;line-height:1.55;word-break:keep-all}
+  .qnow b{color:#33303F;font-weight:800}
   .okdot{color:var(--green);font-weight:800}
   .waitdot{color:var(--amber);font-weight:800}
 
@@ -526,7 +575,7 @@
   @media (max-height:660px){
     .stage{padding-top:4px}
     .critter .pav{width:46px;height:46px}
-    .cr-st{display:none}
+    .cr-st,.cr-load{display:none}
   }
 </style>
 </head>
@@ -573,6 +622,7 @@
       <span class="selchip">
         <select id="selTarget" aria-label="대상 피클">
           <option value="all">전체</option>
+          <option value="auto">자동(여유)</option>
           <option value="sonseonghun1">대장</option>
           <option value="belbes8">벨벳</option>
           <option value="eomma70">엄마</option>
@@ -650,12 +700,25 @@
   var ORDER = ['sonseonghun1','belbes8','eomma70','sond3'];
 
   var TARGET_LABEL = {
-    all:'전체', sonseonghun1:'[손디]', belbes8:'[벨벳]', eomma70:'[엄마]', sond3:'[3번]'
+    all:'전체', auto:'자동(여유)', sonseonghun1:'[손디]', belbes8:'[벨벳]', eomma70:'[엄마]', sond3:'[3번]'
   };
   var PROJECT_LABEL = {
     general:'일반', 'daegu-blog':'daegu-blog', 'hotdeal-threads':'hotdeal-threads'
   };
   var STATUS_TXT = { todo:'todo', doing:'doing', done:'done' };
+
+  /* =========================================================
+     한도 여유 · 자동 배정 기준
+     ========================================================= */
+  var QUOTA_KEY   = 'pickle_team_quota';
+  var QUOTA_HOUR  = 4;              // 매일 04:00 KST 자동 리셋
+  var AUTO_POOL   = ['belbes8','eomma70','sond3'];   // 자동 배정 대상(실무 팀원 3명)
+  var QUOTA_STATES = {
+    free:  {key:'free',   label:'여유', tone:'green'},
+    normal:{key:'normal', label:'보통', tone:'amber'},
+    low:   {key:'low',    label:'부족', tone:'red'}
+  };
+  var QUOTA_RANK = { free:0, normal:1, low:2 };
 
   /* =========================================================
      상태
@@ -665,13 +728,17 @@
     live: null,
     loading: false,
     filter: null,
+    conn: 'snapshot',
     items: [],
     localItems: [],
     renderedIssues: {},
+    quota: null,
+    quotaTimer: null,
     prefs: (function(){
       try { return JSON.parse(readLS(PREF_KEY) || '{}'); } catch(e){ return {}; }
     })()
   };
+  state.quota = loadQuota();
 
   /* =========================================================
      작은 유틸
@@ -712,6 +779,148 @@
   }
   function nowISO(){ return new Date().toISOString(); }
   function shortSha(s){ return String(s||'').slice(0,7); }
+
+  /* =========================================================
+     한도 여유 저장 · 04:00 KST 자동 리셋
+     · 기준 하루는 ‘04:00에 시작하는 날’ — 새벽 4시가 지나면 전날 수동 설정은 사라진다
+     ========================================================= */
+  function kstParts(d){
+    var parts = {year:'0000', month:'01', day:'01', hour:'00', minute:'00', second:'00'};
+    try {
+      new Intl.DateTimeFormat('en-US', {
+        timeZone:'Asia/Seoul', hour12:false,
+        year:'numeric', month:'2-digit', day:'2-digit',
+        hour:'2-digit', minute:'2-digit', second:'2-digit'
+      }).formatToParts(d).forEach(function(p){
+        if (p.type !== 'literal' && parts.hasOwnProperty(p.type)) parts[p.type] = p.value;
+      });
+    } catch(e){}
+    parts.hour = String(Number(parts.hour) % 24);
+    if (parts.hour.length < 2) parts.hour = '0' + parts.hour;
+    return parts;
+  }
+  function quotaDay(ts){
+    var d = new Date((ts == null ? Date.now() : ts) - QUOTA_HOUR * 3600000);
+    var p = kstParts(d);
+    return p.year + '-' + p.month + '-' + p.day;
+  }
+  function msToNextReset(){
+    var p = kstParts(new Date());
+    var cur  = ((Number(p.hour) * 60) + Number(p.minute)) * 60 + Number(p.second);
+    var at   = QUOTA_HOUR * 3600;
+    var diff = at - cur;
+    if (diff <= 0) diff += 86400;
+    return diff * 1000 + 1500;
+  }
+  function defaultQuota(){ return {state:'free', pct:null}; }
+  function loadQuota(){
+    var data = null;
+    try { data = JSON.parse(readLS(QUOTA_KEY) || 'null'); } catch(e){ data = null; }
+    var map = {};
+    var today = quotaDay();
+    if (data && data.day === today && data.map && typeof data.map === 'object'){
+      Object.keys(data.map).forEach(function(k){
+        var v = data.map[k] || {};
+        var st = QUOTA_STATES[v.state] ? v.state : 'free';
+        var pct = (typeof v.pct === 'number' && isFinite(v.pct) && v.pct >= 0 && v.pct <= 100)
+          ? Math.round(v.pct) : null;
+        map[k] = {state:st, pct:pct};
+      });
+    }
+    ORDER.forEach(function(k){ if (!map[k]) map[k] = defaultQuota(); });
+    return {day: today, map: map, resetFrom: (!data || data.day !== today) ? (data ? data.day : null) : null};
+  }
+  function saveQuota(){
+    writeLS(QUOTA_KEY, JSON.stringify({
+      day: state.quota.day,
+      map: state.quota.map
+    }));
+  }
+  function persistQuota(){
+    state.quota.day = quotaDay();
+    saveQuota();
+  }
+  function quotaOf(key){
+    return (state.quota.map[key] || defaultQuota());
+  }
+  function quotaText(q){
+    return QUOTA_STATES[q.state].label + (q.pct == null ? '' : ' ' + q.pct + '%');
+  }
+  function resetQuotaIfNeeded(notify){
+    var today = quotaDay();
+    if (state.quota.day === today) return false;
+    var map = {};
+    ORDER.forEach(function(k){ map[k] = defaultQuota(); });
+    state.quota = {day:today, map:map, resetFrom:null};
+    saveQuota();
+    renderMembers();
+    renderHint();
+    if (notify) toast('04:00 한도 리셋 · 한도 여유를 ‘여유’(미입력)로 되돌렸습니다');
+    return true;
+  }
+  function scheduleQuotaReset(){
+    if (state.quotaTimer) clearTimeout(state.quotaTimer);
+    state.quotaTimer = setTimeout(function(){
+      resetQuotaIfNeeded(true);
+      scheduleQuotaReset();
+    }, Math.min(msToNextReset(), 1500000));
+  }
+
+  /* =========================================================
+     피클별 일감 수 (owner:* 라벨 · 미완료 open)
+     ========================================================= */
+  function countsByOwner(){
+    var c = {};
+    ORDER.forEach(function(k){ c[k] = {open:0, todo:0, doing:0, done:0}; });
+    if (state.live){
+      state.live.issues.forEach(function(i){
+        var o = ownerOfIssue(i);
+        if (!o || !c[o]) return;
+        var st = statusOfIssue(i) || 'todo';
+        if (st === 'done' || i.state === 'closed'){ c[o].done++; return; }
+        c[o].open++;
+        if (st === 'doing') c[o].doing++; else c[o].todo++;
+      });
+    }
+    return c;
+  }
+
+  /* =========================================================
+     자동(여유) 배정 계산
+     ① 부족 제외 ② 여유 > 보통 ③ 같은 등급 안에서 잔여 % 높은 순 ④ 일감 적은 순
+     모두 부족이면 → 일감이 가장 적은 팀원으로 폴백(안내 문구 노출)
+     ========================================================= */
+  function autoPick(){
+    var counts = countsByOwner();
+    var pool = AUTO_POOL.map(function(k){
+      var q = quotaOf(k);
+      return {
+        key:k, q:q,
+        rank: (QUOTA_RANK[q.state] == null ? 0 : QUOTA_RANK[q.state]),
+        pct: (q.pct == null ? -1 : q.pct),
+        open: (state.live ? counts[k].open : 0)
+      };
+    });
+    var usable = pool.filter(function(x){ return x.q.state !== 'low'; });
+    var allLow = usable.length === 0;
+    var list = (allLow ? pool.slice() : usable);
+    list.sort(function(a, b){
+      if (!allLow && a.rank !== b.rank) return a.rank - b.rank;
+      if (a.pct !== b.pct) return b.pct - a.pct;
+      if (a.open !== b.open) return a.open - b.open;
+      return ORDER.indexOf(a.key) - ORDER.indexOf(b.key);
+    });
+    var pick = list[0];
+    return {
+      key: pick.key,
+      state: pick.q.state,
+      pct: pick.q.pct,
+      open: pick.open,
+      allLow: allLow,
+      known: !!state.live,
+      counts: counts
+    };
+  }
 
   function toast(msg, kind){
     var wrap = $('toastWrap');
@@ -1100,26 +1309,22 @@
      ========================================================= */
   function renderMembers(){
     var bar = $('teamBar');
-    var counts = {};
-    if (state.live){
-      state.live.issues.forEach(function(i){
-        var o = ownerOfIssue(i);
-        if (!o) return;
-        counts[o] = counts[o] || {todo:0, doing:0, done:0, total:0};
-        var st = statusOfIssue(i) || 'todo';
-        counts[o][st]++;
-        counts[o].total++;
-      });
-    }
+    var counts = countsByOwner();
+    var autoKey = ($('selTarget') && $('selTarget').value === 'auto') ? autoPick().key : null;
     bar.innerHTML = ORDER.map(function(k){
       var p = PEOPLE[k];
       var sel = state.filter === k;
       var c = counts[k];
-      return '<button class="critter' + (sel ? ' on' : '') + '" type="button" data-who="' + k + '" ' +
-          'aria-pressed="' + (sel ? 'true' : 'false') + '" aria-label="' + esc(p.name + ' ' + p.status) + ' 상세">' +
+      var q = quotaOf(k);
+      var qTxt = quotaText(q);
+      var loadTxt = state.live ? ('일감 ' + c.open) : '일감 –';
+      var aria = p.name + ' · ' + loadTxt + ' · 한도 ' + qTxt + (autoKey === k ? ' (자동 배정 대상)' : '');
+      return '<button class="critter' + (sel ? ' on' : '') + (autoKey === k ? ' auto' : '') + '" type="button" data-who="' + k + '" ' +
+          'aria-pressed="' + (sel ? 'true' : 'false') + '" aria-label="' + esc(aria) + ' 상세">' +
         '<span class="cr-wrap">' + pickleSVG(p, 58) + '</span>' +
         '<span class="cr-name">' + (p.rainbow ? '🌈 ' : '') + esc(p.name) + '</span>' +
-        '<span class="cr-st' + (p.ok ? '' : ' wait') + '"><i></i>' + esc(c && c.total ? p.short + ' ' + c.total : p.short) + '</span>' +
+        '<span class="cr-load' + (p.ok ? '' : ' wait') + '"><i></i>' + esc(loadTxt) + '</span>' +
+        '<span class="cr-q q-' + esc(q.state) + '" title="한도 ' + esc(qTxt) + ' · 매일 04:00 자동 리셋">' + esc(qTxt) + '</span>' +
       '</button>';
     }).join('');
   }
@@ -1295,37 +1500,80 @@
     var txt = $('liveTxt');
     var act = $('liveAct');
     if (state.token && state.live && !err){
+      state.conn = 'live';
       bar.classList.add('live');
       txt.innerHTML = '<b>실시간</b> · ' + esc(liveStats().line) + ' <span class="sep">·</span> ' + esc(fmtTime(state.live.at)) + ' 동기화';
       act.textContent = '새로고침';
       $('btnToken').classList.add('on');
-      $('cmpHint').innerHTML = '<span class="ok">●</span> @' + esc(OWNER) + ' 연결됨 · 전송하면 실제 이슈가 생성됩니다';
+      renderHint();
       return;
     }
     bar.classList.remove('live');
     if (err){
+      state.conn = 'err';
       txt.innerHTML = '<b style="color:#A33">동기화 실패</b> · ' + esc(err.status ? 'HTTP ' + err.status : '네트워크') + ' · 🔑에서 토큰을 확인해 주세요';
       act.textContent = '토큰 설정';
-      $('cmpHint').innerHTML = '<span class="bad">●</span> 동기화 실패 · 토큰을 확인해 주세요';
+      renderHint();
       return;
     }
     if (state.token && !state.live){
+      state.conn = 'saved';
       txt.innerHTML = '토큰 저장됨 · 아직 동기화 전 · 🔄를 눌러 주세요';
       act.textContent = '새로고침';
       $('btnToken').classList.add('on');
+      renderHint();
       return;
     }
+    state.conn = 'snapshot';
     txt.innerHTML = '내장 스냅샷 · 11-28 15:47 기준 · 토큰을 연결하면 실시간';
     act.textContent = '토큰 연결';
-    $('cmpHint').innerHTML = '전체 = <b>[공용]</b> 이슈 · 토큰을 연결하면 바로 생성됩니다';
+    renderHint();
+  }
+
+  /* =========================================================
+     하단 안내 줄 — 자동(여유) 미리보기 / 연결 상태
+     ========================================================= */
+  function renderHint(){
+    var hint = $('cmpHint');
+    if (!hint) return;
+    var target = $('selTarget') ? $('selTarget').value : 'all';
+    if (target === 'auto'){
+      var pick = autoPick();
+      var nm  = PEOPLE[pick.key].name;
+      var pfx = TARGET_LABEL[pick.key];
+      var qTx = quotaText({state:pick.state, pct:pick.pct});
+      var lead;
+      if (pick.allLow) lead = '셋 다 <b>부족</b> → 일감 가장 적은';
+      else if (pick.state === 'free') lead = '지금 가장 여유로운';
+      else lead = '여유가 없어 <b>보통</b> 중 여유로운';
+      hint.classList.add('multi');
+      hint.innerHTML = '자동 배정 · ' + lead + ' <b>' + esc(nm) + '</b>(' + esc(qTx) + ')에게 ' +
+        '<b>' + esc(pfx) + '</b> + owner:' + esc(pick.key) + '로 올라갑니다' +
+        (pick.allLow ? ' · 대장은 담당에서 직접 선택' : '');
+      return;
+    }
+    hint.classList.remove('multi');
+    if (state.conn === 'live'){
+      hint.innerHTML = '<span class="ok">●</span> @' + esc(OWNER) + ' 연결됨 · 전송하면 실제 이슈가 생성됩니다';
+    } else if (state.conn === 'err'){
+      hint.innerHTML = '<span class="bad">●</span> 동기화 실패 · 🔑에서 토큰을 확인해 주세요';
+    } else if (state.conn === 'saved'){
+      hint.innerHTML = '토큰 저장됨 · 🔄 새로고침으로 동기화합니다';
+    } else {
+      hint.innerHTML = (target === 'all'
+        ? '전체 = <b>[공용]</b> 이슈 · 토큰을 연결하면 바로 생성됩니다'
+        : '<b>' + esc(TARGET_LABEL[target] || '') + '</b> 앞으로 올라갑니다 · 토큰을 연결하면 바로 생성됩니다');
+    }
   }
 
   /* =========================================================
      시트
      ========================================================= */
   var lastFocus = null;
-  function openSheet(title, html){
+  var sheetWho = null;
+  function openSheet(title, html, who){
     lastFocus = document.activeElement;
+    sheetWho = who || null;
     $('sheetTitle').textContent = title;
     $('sheetBody').innerHTML = html;
     $('veil').hidden = false;
@@ -1339,20 +1587,63 @@
   function closeSheet(){
     $('veil').hidden = true;
     $('sheet').hidden = true;
+    sheetWho = null;
     document.body.style.overflow = '';
     if (lastFocus && lastFocus.focus) lastFocus.focus({preventScroll:true});
   }
   $('sheetX').addEventListener('click', closeSheet);
   $('veil').addEventListener('click', closeSheet);
 
+  /* ── 한도 여유 설정 영역 ── */
+  function quotaNowText(q, key){
+    var head = '지금 <b>' + esc(quotaText(q)) + '</b>';
+    if (AUTO_POOL.indexOf(key) < 0){
+      return head + ' · 대장은 자동 배정 대상이 아니라 표시용으로만 저장됩니다 · 매일 04:00 리셋';
+    }
+    return head + ' · 자동(여유) 배정에 바로 반영 · 매일 04:00에 ‘여유’(미입력)로 리셋';
+  }
+  function quotaSectionHTML(key){
+    var q = quotaOf(key);
+    var btns = ['free','normal','low'].map(function(s){
+      var on = q.state === s;
+      return '<button class="qbtn' + (on ? ' on' : '') + '" type="button" data-act="qstate" data-q="' + s + '" ' +
+        'aria-pressed="' + (on ? 'true' : 'false') + '">' + QUOTA_STATES[s].label + '</button>';
+    }).join('');
+    return '<div class="qset">' +
+      '<div class="qbtns" role="group" aria-label="한도 상태">' + btns + '</div>' +
+      '<div class="qrow">' +
+        '<label for="qPct">잔여 % <span>(선택 · 비워도 됨)</span></label>' +
+        '<span class="qiwrap"><input id="qPct" type="number" inputmode="numeric" min="0" max="100" step="1" ' +
+          'placeholder="0~100" value="' + (q.pct == null ? '' : q.pct) + '" aria-label="잔여 퍼센트"><span class="qsuf">%</span></span>' +
+      '</div>' +
+      '<div class="qnow" id="qNow">' + quotaNowText(q, key) + '</div>' +
+      '</div>';
+  }
+  function refreshSheetQuota(){
+    var key = sheetWho;
+    if (!key) return;
+    var q = quotaOf(key);
+    var body = $('sheetBody');
+    Array.prototype.forEach.call(body.querySelectorAll('[data-act="qstate"]'), function(b){
+      var on = b.getAttribute('data-q') === q.state;
+      if (on) b.classList.add('on'); else b.classList.remove('on');
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    var now = $('qNow');
+    if (now) now.innerHTML = quotaNowText(q, key);
+  }
+
   /* ── 팀원 시트 ── */
   function openMember(key){
     var p = PEOPLE[key];
     if (!p) return;
-    var issues = [];
+    var all = [];
     if (state.live){
-      issues = state.live.issues.filter(function(i){ return ownerOfIssue(i) === key; });
+      all = state.live.issues.filter(function(i){ return ownerOfIssue(i) === key; });
     }
+    var issues = all.filter(function(i){
+      return i.state !== 'closed' && statusOfIssue(i) !== 'done';
+    });
     var rows = issues.length
       ? '<div class="ilist">' + issues.map(function(i){
           var st = statusOfIssue(i) || 'todo';
@@ -1365,6 +1656,11 @@
       : '<div class="none">' + (state.live
           ? '아직 배정된 이슈가 없습니다. 아래에서 이 피클 앞으로 첫 지시를 보내면 이슈로 올라갑니다.'
           : '토큰을 연결하면 배정된 이슈를 여기에서 실시간으로 보여줍니다.') + '</div>';
+
+    var c = countsByOwner()[key] || {open:0, todo:0, doing:0, done:0};
+    var loadTxt = state.live
+      ? ('<b>' + c.open + '</b>건 열림 · todo ' + c.todo + (c.doing ? ' · doing ' + c.doing : '') + ' · 끝난 일감 ' + c.done)
+      : '토큰을 연결하면 표시됩니다';
 
     var joinTxt = p.ok
       ? '<span class="okdot">✅ 합류 완료</span>'
@@ -1389,8 +1685,10 @@
         '<dt>상태</dt><dd>' + esc(p.status) + '</dd>' +
         '<dt>합류</dt><dd>' + joinTxt + '</dd>' +
         '<dt>GitHub</dt><dd>' + esc(ghTxt) + '</dd>' +
-        '<dt>담당</dt><dd>' + (issues.length ? issues.length + '건 배정' : '미배정') + '</dd>' +
+        '<dt>일감</dt><dd>' + loadTxt + '</dd>' +
       '</dl>' +
+      '<h3 class="sh">한도 여유 설정 <span class="n">매일 04:00 리셋</span></h3>' +
+      quotaSectionHTML(key) +
       '<h3 class="sh">배정된 이슈 <span class="n">' + (issues.length || '0') + '</span></h3>' + rows +
       note +
       '<div class="btn-row2">' +
@@ -1398,7 +1696,7 @@
         '<button class="btn" data-act="assign" data-who="' + key + '">일감 보내기</button>' +
       '</div>';
 
-    openSheet(p.name + ' 피클', html);
+    openSheet(p.name + ' 피클', html, key);
   }
 
   /* ── 토큰 시트 ── */
@@ -1459,10 +1757,12 @@
   }
 
   /* ── 지시 미리보기 / 전달 시트 ── */
-  function openDraft(text, target, project, reason){
+  function openDraft(text, target, project, reason, autoInfo){
     var msg = composePayload(text, target, project);
+    var whoLine = target === 'all' ? '전체' : TARGET_LABEL[target];
+    if (autoInfo) whoLine += ' (자동 배정 · 한도 ' + quotaText({state:autoInfo.state, pct:autoInfo.pct}) + ')';
     var prompt = '[피클팀 일감 요청]\n' +
-      '담당: ' + (target === 'all' ? '전체' : TARGET_LABEL[target]) + '\n' +
+      '담당: ' + whoLine + '\n' +
       '프로젝트: ' + PROJECT_LABEL[project] + '\n' +
       '지시: ' + text + '\n' +
       '(대장 웹앱에서 GitHub 토큰이 없어 손디에게 전달)';
@@ -1505,6 +1805,7 @@
      이슈 만들기
      ========================================================= */
   function composePayload(text, target, project){
+    if (target === 'auto') target = autoPick().key;
     var firstLine = (text.split('\n')[0] || '').trim();
     var shortTitle = firstLine.length > 56 ? firstLine.slice(0, 56) + '…' : firstLine;
     var prefix;
@@ -1538,13 +1839,15 @@
 
   function sendInstruction(){
     var text = $('msg').value.trim();
-    var target = $('selTarget').value;
+    var sel = $('selTarget').value;
+    var autoInfo = (sel === 'auto') ? autoPick() : null;
+    var target = autoInfo ? autoInfo.key : sel;
     var project = $('selProject').value;
 
     if (!text){ toast('지시 내용을 입력해 주세요'); $('msg').focus(); return; }
     if (!state.token){
       toast('GitHub 토큰을 연결하면 바로 이슈로 올릴 수 있어요');
-      openDraft(text, target, project);
+      openDraft(text, target, project, null, autoInfo);
       return;
     }
 
@@ -1556,10 +1859,11 @@
     gh('/repos/' + REPO + '/issues', {method:'POST', body: payload})
       .then(function(issue){
         state.renderedIssues[issue.number] = 1;
-        addSent(text, target, project, issue);
+        addSent(text, target, project, issue, autoInfo);
         $('msg').value = '';
         autoGrow();
-        toast('✅ ' + (target === 'all' ? '[공용]' : TARGET_LABEL[target]) + ' 이슈 #' + issue.number + ' 생성 완료', 'ok');
+        toast('✅ ' + (autoInfo ? '자동 배정 → ' + PEOPLE[target].name + ' · ' : '') +
+          (target === 'all' ? '[공용] ' : TARGET_LABEL[target] + ' ') + '이슈 #' + issue.number + ' 생성 완료', 'ok');
         loadLive(true);
       })
       .catch(function(e){
@@ -1578,19 +1882,22 @@
       });
   }
 
-  function addSent(text, target, project, issue){
+  function addSent(text, target, project, issue, autoInfo){
     var t = nowISO();
+    var whoTxt = (target === 'all' ? '[공용]' : TARGET_LABEL[target]);
     var me = {
       kind:'me', t:t, text:text,
       chips:[
-        {type:'label', v: target === 'all' ? '전체' : TARGET_LABEL[target]},
+        {type:'label', v: autoInfo ? ('자동 배정 → ' + whoTxt) : whoTxt},
         {type:'label', v: PROJECT_LABEL[project]},
         {type:'issue', n:issue.number, title:'방금 생성'}
       ]
     };
     var ack = {
       kind:'msg', who:'sonseonghun1', t:t,
-      text:'지시 접수 — ' + (target === 'all' ? '[공용]' : TARGET_LABEL[target]) + ' 이슈로 올렸습니다. 담당 피클이 확인하면 status:doing으로 바꾸고 결과물을 outputs/에 남깁니다.',
+      text:'지시 접수 — ' + whoTxt + ' 이슈로 올렸습니다.' +
+        (autoInfo ? ' 한도 여유 기준 자동 배정으로 ' + PEOPLE[target].name + '에게 배정했습니다.' : '') +
+        ' 담당 피클이 확인하면 status:doing으로 바꾸고 결과물을 outputs/에 남깁니다.',
       chips:[
         {type:'issue', n:issue.number, title:issue.title || ''},
         {type:'status', v:'todo'}
@@ -1644,7 +1951,11 @@
 
   $('btnSend').addEventListener('click', sendInstruction);
 
-  $('selTarget').addEventListener('change', savePrefs);
+  $('selTarget').addEventListener('change', function(){
+    savePrefs();
+    renderMembers();
+    renderHint();
+  });
   $('selProject').addEventListener('change', savePrefs);
   function savePrefs(){
     state.prefs.target = $('selTarget').value;
@@ -1670,6 +1981,18 @@
     var b = e.target.closest('[data-act]');
     if (!b) return;
     var act = b.getAttribute('data-act');
+    if (act === 'qstate'){
+      var qs = b.getAttribute('data-q');
+      if (!sheetWho || !QUOTA_STATES[qs]) return;
+      state.quota.map[sheetWho].state = qs;
+      persistQuota();
+      refreshSheetQuota();
+      renderMembers();
+      renderHint();
+      toast(PEOPLE[sheetWho].name + ' 한도 = ' + QUOTA_STATES[qs].label +
+        (state.quota.map[sheetWho].pct == null ? '' : ' ' + state.quota.map[sheetWho].pct + '%'));
+      return;
+    }
     if (act === 'token'){ closeSheet(); setTimeout(openToken, 120); return; }
     if (act === 'outputs'){ closeSheet(); setTimeout(openOutputs, 120); return; }
     if (act === 'refresh'){ closeSheet(); loadLive(false); return; }
@@ -1722,6 +2045,29 @@
     }
   });
 
+  // 잔여 % 입력 — 입력하는 즉시 저장·미리보기 반영
+  $('sheetBody').addEventListener('input', function(e){
+    var t = e.target;
+    if (!t || t.id !== 'qPct' || !sheetWho) return;
+    var raw = String(t.value).trim();
+    var pct = null;
+    if (raw !== ''){
+      var n = Number(raw);
+      if (isFinite(n)) pct = Math.max(0, Math.min(100, Math.round(n)));
+    }
+    state.quota.map[sheetWho].pct = pct;
+    persistQuota();
+    refreshSheetQuota();
+    renderMembers();
+    renderHint();
+  });
+  $('sheetBody').addEventListener('change', function(e){
+    var t = e.target;
+    if (!t || t.id !== 'qPct' || !sheetWho) return;
+    var q = quotaOf(sheetWho);
+    t.value = (q.pct == null ? '' : String(q.pct));
+  });
+
   function showRawPrompt(txt){
     var d = document.createElement('div');
     d.className = 'note';
@@ -1770,6 +2116,12 @@
     if (state.prefs.target && TARGET_LABEL[state.prefs.target]) $('selTarget').value = state.prefs.target;
     if (state.prefs.project && PROJECT_LABEL[state.prefs.project]) $('selProject').value = state.prefs.project;
 
+    // 04:00 KST 지난 뒤 첫 방문이면 전날 수동 설정은 이미 ‘여유’로 돌아가 있다
+    if (state.quota.resetFrom){
+      saveQuota();
+    }
+    scheduleQuotaReset();
+
     buildItems();
     render();
     renderMembers();
@@ -1783,6 +2135,12 @@
 
     if (state.token) loadLive(true);
   }
+
+  // 탭으로 돌아왔을 때도 04:00 경계를 넘겼는지 확인
+  document.addEventListener('visibilitychange', function(){
+    if (!document.hidden) resetQuotaIfNeeded(false);
+  });
+  window.addEventListener('focus', function(){ resetQuotaIfNeeded(false); });
 
   boot();
 })();
