@@ -127,8 +127,9 @@
   }
   .critter:active{transform:scale(.975)}
   .critter.on::before{
-    content:"";position:absolute;left:2px;right:2px;top:2px;bottom:0;
-    border-radius:16px;background:rgba(108,77,255,.07);
+    content:"";position:absolute;left:50%;top:3px;
+    width:56px;height:56px;margin-left:-28px;
+    border-radius:20px;background:rgba(108,77,255,.08);
   }
   .cr-wrap{position:relative;display:block;line-height:0;animation:bob 3.8s ease-in-out infinite;transition:transform .12s}
   .critter:nth-child(2) .cr-wrap{animation-delay:.45s}
