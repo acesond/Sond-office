@@ -263,33 +263,6 @@
   }
   .msg.me .bubble .em{color:#4B2FC9}
 
-  /* ================= pickle card (inside bubble) ================= */
-  .bubble.is-card{padding:12px 13px 12px}
-  .pcard-h{display:flex;gap:8px;align-items:flex-start}
-  .pcard-emoji{
-    flex:0 0 auto;width:27px;height:27px;border-radius:9px;
-    display:grid;place-items:center;font-size:14px;line-height:1;
-    background:var(--violet-soft);
-  }
-  .pcard-tx{min-width:0;padding-top:1px}
-  .pcard-t{display:block;font-size:13.4px;font-weight:800;letter-spacing:-.02em;color:#201E2A;line-height:1.35}
-  .pcard-s{display:block;font-size:10.6px;color:var(--muted);margin-top:2px;line-height:1.35}
-  .pcard-rows{
-    margin:9px 0 0;padding:8px 0 0;border-top:1px solid var(--line);
-    display:grid;grid-template-columns:auto 1fr;gap:5px 10px;
-    font-size:11.4px;line-height:1.4;
-  }
-  .pcard-rows dt{color:var(--muted);font-weight:700;white-space:nowrap}
-  .pcard-rows dd{margin:0;color:#332F40;font-weight:750;min-width:0}
-  .pcard-link{
-    display:flex;align-items:center;justify-content:center;gap:5px;
-    margin-top:10px;padding:8px 10px;border-radius:11px;
-    background:#F4F1FF;color:var(--violet-deep);
-    font-size:11.6px;font-weight:800;letter-spacing:-.01em;
-    transition:background .12s;
-  }
-  .pcard-link:active{background:#E9E3FF}
-
   /* reaction chips */
   .reacts{display:flex;flex-wrap:wrap;gap:4px;margin-top:1px;padding-left:2px}
   .msg.me .reacts{justify-content:flex-end;padding:0 2px 0 0}
@@ -325,6 +298,16 @@
   .chip.st-done{background:var(--done-bg);border-color:#C6EAD7;color:var(--done)}
   .chip-label{background:#F6F3FF;border-color:#E6DEFF;color:#5B34C9}
   .chip-who{background:#F4F2FB;border-color:#E6E2F2;color:#5A5570;font-weight:800}
+
+  /* 댓글 말풍선 위에 붙는 이슈 태그 (#번호 제목) */
+  .btag{
+    display:inline-block;max-width:100%;vertical-align:top;
+    font-size:9.5px;font-weight:800;letter-spacing:-.01em;line-height:1.4;
+    color:#7A7590;background:#F4F2FB;border-radius:6px;padding:1px 6px;
+    margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .btag:active{background:#EAE6F7}
+  .chip.sm{font-size:9.4px;padding:1px 6px;border-radius:6px}
 
   /* ✋ 손들기 · ✅ 완료 · ▶ 착수 표시 */
   .mk{
@@ -379,6 +362,15 @@
   .sys.live .ico{background:#E4F6EC}
   .sys.live b{color:#14472F}
   .sys.live button.mini{background:#E7F7EE;color:#1B6B45}
+  /* 한 줄 안내(스냅샷 고지) — 대화를 가리지 않게 얇게 */
+  .sys.slim{
+    align-items:center;gap:7px;padding:6px 8px 6px 9px;border-radius:12px;
+    font-size:10.4px;line-height:1.35;box-shadow:none;
+    background:#FBFAFF;border-color:var(--line2);color:#6D6879;
+  }
+  .sys.slim .ico{width:19px;height:19px;border-radius:7px;font-size:10.5px;background:var(--violet-soft)}
+  .sys.slim span.mid{min-width:0;flex:1 1 auto;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sys.slim button.mini{margin:0;flex:0 0 auto;padding:4px 9px;font-size:10px;border-radius:8px}
 
   .empty{
     margin:auto;text-align:center;color:var(--muted2);font-size:12px;
@@ -581,6 +573,38 @@
   details.acc[open] summary::before{content:"▾"}
   details.acc > div{padding:2px 12px 12px}
 
+  /* ================= 📋 작업 내역 시트 ================= */
+  .ttabs{display:flex;gap:4px;padding:3px;margin:0 0 13px;background:#F4F2FB;border-radius:12px}
+  .ttab{
+    flex:1 1 0;min-width:0;border:0;background:transparent;color:#6A6680;
+    border-radius:9px;padding:7px 4px;font-size:11.4px;font-weight:800;line-height:1.3;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .ttab b{font-size:9.6px;font-weight:800;color:#9894A8;margin-left:3px}
+  .ttab.on{background:#fff;color:var(--violet-ink);box-shadow:0 1px 4px rgba(60,45,140,.13)}
+  .ttab.on b{color:var(--violet-deep)}
+  .tgroup{display:flex;align-items:center;gap:5px;font-size:10.6px;font-weight:800;color:var(--muted);margin:14px 0 7px}
+  .tgroup:first-of-type{margin-top:0}
+  .tgroup .n{background:#F2F0F8;border-radius:999px;padding:0 6px;font-size:9.6px;color:#5A566C}
+  .tlist{display:flex;flex-direction:column;gap:7px}
+  .trow{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:13px;padding:9px 10px;background:var(--surface)}
+  .trow .tav{flex:0 0 auto;line-height:0;margin-top:1px}
+  .trow .tav .pav{width:23px;height:23px;display:block}
+  .trow .tb{flex:1 1 auto;min-width:0}
+  .trow .tt{display:block;font-size:12.1px;font-weight:750;line-height:1.4;color:#25232E;word-break:break-word}
+  .trow .tt:active{color:var(--violet-deep)}
+  .trow .tm{display:flex;flex-wrap:wrap;align-items:center;gap:3px 6px;font-size:9.8px;color:var(--muted2);margin-top:4px}
+  .trow .tm .tw{font-weight:800;color:#5B576B}
+  .trow .tm .gh{color:var(--violet-deep);font-weight:800}
+  .trow .to{display:flex;flex-direction:column;align-items:flex-start;gap:3px;margin-top:5px}
+  .trow .to a{
+    display:inline-flex;align-items:center;gap:4px;max-width:100%;
+    font-size:9.8px;font-weight:750;color:#1B6B45;background:#F1FBF5;
+    border:1px solid #D3EEDE;border-radius:7px;padding:2px 7px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .trow .to a:active{background:#E4F6EC}
+
   .pmsg{font-size:11.4px;line-height:1.6;color:#6D6879;margin:0 0 10px}
   .pmsg b{color:#33303F}
 
@@ -633,6 +657,7 @@
         <p>피클팀 공용 작업방</p>
       </div>
       <div class="hd-act">
+        <button class="icbtn" id="btnTasks" aria-label="작업 내역 보기" title="작업 내역 (진행 중·처리했던 일)">📋</button>
         <button class="icbtn" id="btnClear" aria-label="대화 비우기(지난 말풍선 숨기기)" title="대화 비우기">🧹</button>
         <button class="icbtn" id="btnOutputs" aria-label="결과물 폴더 보기" title="결과물(outputs) 보기">🗂</button>
         <button class="icbtn" id="btnRefresh" aria-label="새로고침" title="GitHub에서 새로고침">🔄</button>
@@ -646,7 +671,7 @@
 
   <div class="livebar" id="liveBar">
     <span class="pip"></span>
-    <span class="txt" id="liveTxt">내장 스냅샷 · 11-28 15:47 기준</span>
+    <span class="txt" id="liveTxt">내장 스냅샷 · 11-28 16:52 기준</span>
     <button id="liveAct" type="button">토큰 연결</button>
   </div>
 
@@ -1037,90 +1062,64 @@
   }
 
   /* =========================================================
-     초기 내장 스냅샷 — 실제 저장소 상태 (2026-11-28 11:30 KST)
+     초기 내장 스냅샷 — 저장소 실제 상태 (2026-11-28 16:52 KST)
+     · 메인 타임라인은 ‘대화’만 보여 준다. 이슈 본문의 ## 무엇을 / ## 업무 개요 요약과
+       실제 댓글만 담고, 작업 카드·결과물 카드는 여기서 만들지 않는다.
      ========================================================= */
-  var SNAP_COMMITS = {
-    '27d2e79':1, 'aa7d76e':1, '25f7575':1, '2e20a1a':1, '2e95a37':1, '281810c':1, '990c0aa':1
-  };
-  var SNAP_ISSUES = { 1:1, 2:1, 3:1 };
-  var SNAP_COMMENT_KEYS = {
-    '1|2026-11-28T01:31:14Z':1,
-    '1|2026-11-28T02:28:35Z':1,
-    '1|2026-11-28T02:30:11Z':1,
-    '1|2026-11-28T06:42:05Z':1,
-    '2|2026-11-28T06:42:08Z':1
-  };
+  var SNAP_AT = '11-28 16:52';
+  var SNAP_ISSUE_DATA = [
+    {n:4,  t:'[공용] 메세지 다 지워줘', st:'done', who:null, at:'2026-11-28T07:16:59Z', closed:'2026-11-28T07:22:58Z',
+     body:'## 무엇을\n\n메세지 다 지워줘'},
+    {n:5,  t:'[공용] 각자 이름을 1호기 2호기 3호기로 설정해', st:'doing', who:null, at:'2026-11-28T07:18:39Z', closed:null,
+     body:'## 무엇을\n\n각자 이름을 1호기 2호기 3호기로 설정해'},
+    {n:6,  t:'[공용] 다했니?', st:'done', who:null, at:'2026-11-28T07:22:17Z', closed:'2026-11-28T07:24:20Z',
+     body:'## 무엇을\n\n다했니?'},
+    {n:7,  t:'[손디] 코인 웹앱(손디코인분석) 15분 관점·진입가 감시 및 매일 10시 가설 갱신', st:'doing', who:'sonseonghun1',
+     at:'2026-11-28T07:36:40Z', closed:null,
+     body:'## 업무 개요\n손디(@sonseonghun1)가 그동안 상시로 맡아 운영해 온 코인 분석 업무를 공용 작업공간에 등록합니다.'},
+    {n:8,  t:'[손디] 대구·구미 채용 매일 10시 점검 및 아침 브리핑', st:'doing', who:'sonseonghun1',
+     at:'2026-11-28T07:36:43Z', closed:null,
+     body:'## 업무 개요\n손디(@sonseonghun1)가 그동안 매일 돌려 온 채용 점검·아침 브리핑 업무를 공용 작업공간에 등록합니다.'},
+    {n:9,  t:'[1호기] 체험단 신청·당첨 확인 및 무료 퀴즈 응모', st:'doing', who:'belbes8',
+     at:'2026-11-28T07:36:45Z', closed:null,
+     body:'## 업무 개요\n벨벳(@belbes8, 1호기)에게 인계되어 진행 중인 체험단·퀴즈 업무를 공용 작업공간에 등록합니다.'},
+    {n:10, t:'[3호기] 대구 1호선 맛집 블로그 및 @everyday_hotdeal 스레드 초안 운영', st:'doing', who:'sond3',
+     at:'2026-11-28T07:36:47Z', closed:null,
+     body:'## 업무 개요\n3호기(@sond3)가 진행 중인 블로그·스레드 초안 업무를 공용 작업공간에 등록합니다.'}
+  ];
+  var SNAP_COMMENT_DATA = [
+    {n:4, at:'2026-11-28T07:20:56Z', b:'✋ [손디] 제가 맡아서 채팅방 비우기 기능과 실시간 댓글 표시를 반영하겠습니다!'},
+    {n:5, at:'2026-11-28T07:19:03Z', b:'✋ [손디] 총괄 대장이 확인해 바로 분배했습니다!\n- 벨벳(@belbes8) → 1호기\n- 엄마(@eomma70) → 2호기\n- 3번(@sond3) → 3호기\n각자 손들고 이름 변경 후 완료 댓글을 남겨 주세요.'},
+    {n:4, at:'2026-11-28T07:22:53Z', b:'✅ [손디] 완료했습니다! 대화 비우기(🧹) 버튼과 피클 손들기·완료 댓글 실시간 표시까지 적용해 배포했습니다.\n\n- 결과물: `outputs/general/2026-11-28-대화-비우기-기능.md`\n- 배포: https://acesond.github.io/Sond-office/team.html (커밋 `c23c45f`)\n\n이제 이 방에서 메시지를 남기면, 담당 피클이 이슈에 ✋ 손들기로 답하고 끝나면 ✅ 완료했습니다로 보고하는 것이 채팅 타임라인에 그대로 보입니다.'},
+    {n:6, at:'2026-11-28T07:24:16Z', b:'✋ [손디] 제가 전체 현황 바로 정리해 드릴게요!'},
+    {n:6, at:'2026-11-28T07:24:17Z', b:'✅ [손디] 현재 현황 보고드립니다!\n- 이슈 #4 (메세지 다 지워줘): 완료! team.html에 🧹 비우기 버튼과 피클 손들기·완료 댓글 실시간 표시까지 배포했습니다.\n- 이슈 #5 (1호기·2호기·3호기 이름 변경): 벨벳(1호기)·엄마(2호기)·3번(3호기) 모두 전달받았고, 각 폰에서 이름 변경 확인을 누르시면 바로 완료 댓글이 올라옵니다.'},
+    {n:7, at:'2026-11-28T07:36:50Z', b:'✋ [손디] 기존 진행 업무를 공용 작업공간에 등록하고 이어서 진행 중입니다.'},
+    {n:8, at:'2026-11-28T07:36:52Z', b:'✋ [손디] 기존 진행 업무를 공용 작업공간에 등록하고 이어서 진행 중입니다.'},
+    {n:9, at:'2026-11-28T07:36:53Z', b:'✋ [1호기] 기존 진행 업무를 공용 작업공간에 등록하고 이어서 진행 중입니다.'},
+    {n:10, at:'2026-11-28T07:36:54Z', b:'✋ [3호기] 기존 진행 업무를 공용 작업공간에 등록하고 이어서 진행 중입니다.'},
+    {n:5, at:'2026-11-28T07:40:06Z', b:'✅ [3호기] 프로필 이름 3호기 변경 완료 (비서 이름은 기존 쓰레드 유지)\n\n- 프로필 이름: 3호기 로 변경 완료 (@sond3)\n- 이슈 말머리·팀 표: 3호기(@sond3) 로 구분해 이어가겠습니다 (이슈 #5 처리 완료, 검수 부탁드립니다)'}
+  ];
+  var SNAP_FILES = [{path:'outputs/general/2026-11-28-대화-비우기-기능.md'}];
 
-  function snapshotItems(){
-    return [
-      {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:41:00+09:00',
-        text:'오늘부터 손성훈이 대장으로 새로 시작합니다. 기존 공용 작업공간 구성은 전부 폐기하고 `손성훈(대장)·1호기·2호기·3호기` 4인 체제로 다시 엽니다.\n지난 이슈는 모두 정리했고, 팀 표·라벨·온보딩 이슈도 4인 기준으로 새로 만들었습니다.',
-        react:[{e:'🎉', n:3}]
-      },
-      {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:42:00+09:00',
-        text:'4인 팀 표입니다. 대장이 일감을 만들어 배분하고, 셋은 자기 말머리 일감만 처리합니다.',
-        card:{
-          emoji:'🐣', title:'손성훈(대장)·1호기·2호기·3호기', sub:'4인 피클팀',
-          rows:[
-            ['총괄 대장','손성훈 · 손디 (@sonseonghun1)'],
-            ['팀원','1호기 (@belbes8) · 2호기 (@eomma70) · 3호기 (@sond3)'],
-            ['담당 구분','말머리 + owner:* 라벨']
-          ],
-          link:{label:'README에서 보기', href:REPO_URL + '/blob/main/README.md'}
-        },
-        chips:[{type:'label', v:'owner:sonseonghun1'}]
-      },
-      {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:43:00+09:00',
-        text:'담당 라벨을 4인 기준으로 다시 세팅했습니다. `owner:eomma70`(2호기)을 새로 넣고, README와 `scripts/setup-labels.sh`도 새 팀 표로 고쳤어요.',
-        chips:[
-          {type:'commit', sha:'990c0aa'},
-          {type:'label', v:'owner:sonseonghun1'},
-          {type:'label', v:'owner:belbes8'},
-          {type:'label', v:'owner:eomma70'},
-          {type:'label', v:'owner:sond3'}
-        ]
-      },
-      {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:44:00+09:00',
-        text:'첫 일감으로 4인 온보딩 이슈를 올렸습니다. 1호기·2호기·3호기는 체크리스트만 끝내면 바로 일감을 받습니다.',
-        card:{
-          emoji:'📋', title:'4인 피클팀 온보딩', sub:'첫 일감 · 이슈 #3',
-          rows:[
-            ['담당','전체 (대장이 분배)'],
-            ['상태','todo'],
-            ['라벨','status:todo · owner:sonseonghun1']
-          ],
-          link:{label:'이슈 #3 열기', href:REPO_URL + '/issues/3'}
-        },
-        chips:[{type:'issue', n:3, title:'4인 피클팀 온보딩'},{type:'status', v:'todo'},{type:'commit', sha:'990c0aa'}],
-        react:[{e:'🙌', n:3}]
-      },
-      {
-        kind:'msg', who:'belbes8', t:'2026-11-28T15:45:30+09:00',
-        text:'1호기 대기 중입니다. `[1호기]` 말머리 + `owner:belbes8` 라벨이 붙은 일감부터 처리하겠습니다.',
-        chips:[{type:'label', v:'owner:belbes8'}],
-        react:[{e:'👍', n:2}]
-      },
-      {
-        kind:'msg', who:'eomma70', t:'2026-11-28T15:46:00+09:00',
-        text:'2호기도 준비됐습니다. `[2호기]` 말머리 + `owner:eomma70` 라벨로 일감 주세요.',
-        chips:[{type:'label', v:'owner:eomma70'}],
-        react:[{e:'🙌', n:2}]
-      },
-      {
-        kind:'msg', who:'sond3', t:'2026-11-28T15:46:30+09:00',
-        text:'3호기 그대로 있습니다. `[3호기]` 말머리 + `owner:sond3` 라벨로 받습니다.',
-        chips:[{type:'label', v:'owner:sond3'}]
-      },
-      {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:47:00+09:00',
-        text:'좋습니다. 1호기·2호기·3호기 모두 대기 확인했습니다. 아래 입력창에서 담당을 고르고 지시를 보내면 그 말머리와 `owner:*` 라벨이 붙은 이슈가 바로 생깁니다.',
-        chips:[{type:'status', v:'todo'}]
-      }
-    ];
+  /* 스냅샷을 GitHub API 응답과 같은 모양으로 */
+  function snapshotIssues(){
+    return SNAP_ISSUE_DATA.map(function(r){
+      var labels = [{name:'status:' + (r.st || 'todo')}];
+      if (r.who) labels.push({name:'owner:' + r.who});
+      return {
+        number:r.n, title:r.t, body:r.body || '',
+        state: (r.st === 'done' ? 'closed' : 'open'),
+        labels:labels, created_at:r.at, updated_at:r.closed || r.at, closed_at:r.closed || null
+      };
+    });
+  }
+  function snapshotComments(){
+    return SNAP_COMMENT_DATA.map(function(r, i){
+      return {
+        id:'snap' + i, body:r.b, created_at:r.at,
+        issue_url:'https://api.github.com/repos/' + REPO + '/issues/' + r.n
+      };
+    });
   }
 
   /* =========================================================
@@ -1329,69 +1328,79 @@
     return isNaN(v) ? 0 : v;
   }
 
+  /* =========================================================
+     대화 말풍선 만들기
+     · 성훈님 지시 = 이슈 본문의 ‘## 무엇을 / ## 업무 개요’ 요약 1줄
+     · 피클 답변 = 이슈 댓글 그대로 (#번호 제목 태그만 작게)
+     · 작업 카드(📥/🛠/✅)·결과물 카드는 메인 타임라인에 만들지 않는다 → 📋 작업 내역
+     ========================================================= */
+  function oneLine(md){
+    var out = plainFromMd(md)
+      .replace(/\s*\n+\s*/g, ' ')
+      .replace(/^[\s·•\-–—]+/, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    if (out.length > 130) out = out.slice(0, 130).replace(/[\s,·]+$/, '') + '…';
+    return out;
+  }
+  function stripHead(title){
+    return String(title || '').replace(/^\s*\[[^\]]+\]\s*/, '').trim();
+  }
+  function issueSay(i){
+    var body = String((i && i.body) || '');
+    var m = /^#{2,3}\s*(무엇을|업무 개요|요청 내용|지시 사항)\s*$/m.exec(body);
+    var chunk = '';
+    if (m){
+      var rest = body.slice(m.index + m[0].length);
+      var nx = /^#{2,3}\s+\S/m.exec(rest);
+      chunk = nx ? rest.slice(0, nx.index) : rest;
+    } else {
+      chunk = body.split(/\n#{2,3}\s/)[0];
+    }
+    var txt = oneLine(chunk);
+    if (!txt) txt = stripHead(i && i.title);
+    return txt || String((i && i.title) || '');
+  }
+  function commentSay(body){
+    var t = plainFromMd(body);
+    t = t.replace(/^[\s✋✅🙌▶️]+/, '');
+    t = t.replace(/^\[([^\]\n]{1,12})\]\s*/, function(mm, head){ return headKey(head) ? '' : mm; });
+    return t.trim();
+  }
+  function itemsFromData(issues, comments, live){
+    var items = [];
+    var byNum = {};
+    (issues || []).forEach(function(i){
+      byNum[String(i.number)] = i;
+      items.push({
+        kind:'me', who:'sonseonghun1', t:i.created_at, live:!!live,
+        ref:i.number, full:i.title, text:issueSay(i)
+      });
+    });
+    (comments || []).forEach(function(cm){
+      var num = commentIssueNo(cm);
+      var iss = num ? (byNum[num] || null) : null;
+      var text = commentSay(cm.body);
+      if (!text) return;
+      items.push({
+        kind:'msg', who:whoFromComment(cm.body, iss), t:cm.created_at, live:!!live,
+        mark: markOfComment(cm.body),
+        text: text,
+        tag: num ? {n:Number(num), title: iss ? stripHead(iss.title) : ''} : null
+      });
+    });
+    return items;
+  }
+
   function buildItems(){
     var live = state.live;
-    var items = [];
+    var items;
 
     if (!live){
       // 토큰이 없을 때만 내장 스냅샷으로 보여준다 (연결되면 실제 이슈·댓글만)
-      items = snapshotItems();
+      items = itemsFromData(snapshotIssues(), snapshotComments(), false);
     } else {
-      var byNum = {};
-
-      // 1) 실제 이슈 → 일감 말풍선
-      live.issues.forEach(function(i){
-        byNum[String(i.number)] = i;
-        var owner = ownerOfIssue(i);
-        var asg = assigneesOf(i);
-        var who = asg.length ? asg[0] : (owner || 'sonseonghun1');
-        var st = statusOfIssue(i) || (i.state === 'closed' ? 'done' : 'todo');
-        var chips = [{type:'issue', n:i.number, title:i.title},{type:'status', v:st}];
-        if (owner) chips.push({type:'label', v:'owner:' + owner});
-        else if (asg.length) chips.push({type:'label', v:'owner:' + asg[0]});
-        var lead = st === 'done' ? '일감 완료 — ' : (st === 'doing' ? '일감 착수 — ' : '일감이 올라왔습니다 — ');
-        var bodyFirst = (i.body || '').split('\n').filter(function(x){ return x.trim() && !/^#|^\||^- \[/.test(x.trim()); })[0] || '';
-        items.push({
-          kind:'msg', who:who, t:i.created_at, live:true,
-          text: lead + i.title + (bodyFirst ? '\n' + bodyFirst.slice(0,140) : ''),
-          card:{
-            emoji: st === 'done' ? '✅' : (st === 'doing' ? '🛠' : '📥'),
-            title:i.title,
-            sub:'이슈 #' + i.number + (i.state === 'closed' ? ' · 닫힘' : ''),
-            rows:[
-              ['담당', PEOPLE[who].name + (asg.length ? ' · @' + asg[0] : '')],
-              ['상태', st]
-            ],
-            link:{label:'이슈 #' + i.number + ' 열기', href:REPO_URL + '/issues/' + i.number}
-          },
-          chips: chips
-        });
-      });
-
-      // 2) 실제 댓글 → 피클 말풍선 (✋ 손들기 / ✅ 완료 / ▶ 착수 표시)
-      live.comments.forEach(function(cm){
-        var num = commentIssueNo(cm);
-        var iss = num ? (byNum[num] || null) : null;
-        var who = whoFromComment(cm.body, iss);
-        var chips = [];
-        if (num) chips.push({type:'issue', n:Number(num), title: iss ? iss.title : '이슈 댓글'});
-        items.push({
-          kind:'msg', who:who, t:cm.created_at, live:true,
-          mark: markOfComment(cm.body),
-          text: plainFromMd(cm.body),
-          chips: chips
-        });
-      });
-
-      // 3) 결과물 파일 (최근 것만)
-      if (live.files.length){
-        var recent = live.files.slice(-6).reverse();
-        items.push({
-          kind:'msg', who:'sonseonghun1', t:live.at, live:true,
-          text:'결과물 폴더에 ' + live.files.length + '개 파일이 있습니다. 🗂 버튼에서 전체를 볼 수 있어요.',
-          chips: recent.slice(0,3).map(function(f){ return {type:'file', path:f.path}; })
-        });
-      }
+      items = itemsFromData(live.issues, live.comments, true);
     }
 
     // 이 웹앱에서 방금 보낸 지시(로컬 반향) — 실시간 이슈가 확인되면 접수 말풍선은 접는다
@@ -1477,22 +1486,6 @@
     return safe.split('\n').map(function(line){ return '<p>' + (line || '&nbsp;') + '</p>'; }).join('');
   }
 
-  function cardHTML(card){
-    var rows = (card.rows || []).map(function(r){
-      return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>';
-    }).join('');
-    return '<div class="pcard-h">' +
-        '<span class="pcard-emoji" aria-hidden="true">' + (card.emoji || '📌') + '</span>' +
-        '<span class="pcard-tx">' +
-          '<span class="pcard-t">' + esc(card.title || '') + '</span>' +
-          (card.sub ? '<span class="pcard-s">' + esc(card.sub) + '</span>' : '') +
-        '</span>' +
-      '</div>' +
-      (rows ? '<dl class="pcard-rows">' + rows + '</dl>' : '') +
-      (card.link ? '<a class="pcard-link" href="' + card.link.href + '" target="_blank" rel="noopener">' +
-        esc(card.link.label || '열기') + ' ↗</a>' : '');
-  }
-
   function reactsHTML(it, mi){
     if (!it.react || !it.react.length) return '';
     return '<div class="reacts">' + it.react.map(function(r, ri){
@@ -1516,22 +1509,13 @@
 
     var out = [];
 
-    // 안내 카드 (맨 위)
+    // 안내 (맨 위) — 대화를 가리지 않게 한 줄만
     if (!state.token){
-      out.push('<div class="sys">' +
+      out.push('<div class="sys slim">' +
         '<span class="ico" aria-hidden="true">🔑</span>' +
-        '<div><b>내장 스냅샷으로 보고 있어요.</b> 2026-11-28 15:47 기준 저장소 상태입니다. ' +
-        'GitHub 토큰을 한 번 넣어 두면 이 방이 실시간으로 바뀌고, 아래 입력창의 지시가 실제 이슈로 올라갑니다.' +
-        '<div class="btn-row">' +
-          '<button class="mini" data-act="token">🔑 GitHub 토큰 설정</button>' +
-          '<button class="mini" data-act="outputs">🗂 결과물</button>' +
-        '</div></div></div>');
-    } else if (state.live){
-      var stats = liveStats();
-      out.push('<div class="sys live">' +
-        '<span class="ico" aria-hidden="true">🛰</span>' +
-        '<div><b>실시간 연결됨.</b> ' + esc(stats.line) +
-        '<div class="btn-row"><button class="mini" data-act="refresh">🔄 새로고침</button></div></div></div>');
+        '<span class="mid">내장 스냅샷 · ' + esc(SNAP_AT) + ' 기준 저장소 대화</span>' +
+        '<button class="mini" data-act="token">토큰 연결</button>' +
+      '</div>');
     }
 
     // 비우기 배지
@@ -1550,7 +1534,7 @@
       } else if (state.live){
         emptyMsg = clearedAt
           ? '이전 대화를 모두 숨겼습니다.<br>새 소식이 오면 여기부터 쌓입니다.'
-          : '저장소에 올라온 일감·댓글이 아직 없습니다.<br>아래 입력창에서 첫 지시를 보내 보세요.';
+          : '아직 나눈 대화가 없습니다.<br>아래 입력창에서 첫 지시를 보내 보세요.';
       } else if (clearedAt){
         emptyMsg = '이전 대화를 모두 숨겼습니다.';
       } else {
@@ -1582,9 +1566,13 @@
               '<span class="t">' + esc(fmtTime(it.t)) + '</span>' +
               (it.live ? '<span class="h">· 실시간</span>' : '') +
             '</div>' +
-            '<div class="bubble' + (it.card ? ' is-card' : '') + (it.mark ? ' mk-' + it.mark.k : '') + '">' +
+            '<div class="bubble' + (it.mark ? ' mk-' + it.mark.k : '') + '">' +
+              (it.tag
+                ? '<a class="btag" href="' + REPO_URL + '/issues/' + it.tag.n + '" target="_blank" rel="noopener">#' +
+                    it.tag.n + (it.tag.title ? ' ' + esc(it.tag.title) : '') + '</a>'
+                : '') +
               (it.mark ? '<span class="mk mk-' + it.mark.k + '">' + esc(it.mark.label) + '</span>' : '') +
-              (it.card ? cardHTML(it.card) : bubbleText(it.text)) +
+              bubbleText(it.text) +
               (it.chips && it.chips.length
                 ? '<div class="chips">' + it.chips.map(chipHTML).join('') + '</div>'
                 : '') +
@@ -1596,7 +1584,7 @@
         out.push('<div class="msg me">' +
           '<div class="bd">' +
             '<div class="who"><b>성훈님</b><span class="t">' + esc(fmtTime(it.t)) + '</span></div>' +
-            '<div class="bubble">' + bubbleText(it.text) +
+            '<div class="bubble" title="' + esc(it.full || '') + '">' + bubbleText(it.text) +
               (it.chips && it.chips.length
                 ? '<div class="chips">' + it.chips.map(chipHTML).join('') + '</div>'
                 : '') +
@@ -1691,7 +1679,7 @@
       return;
     }
     state.conn = 'snapshot';
-    txt.innerHTML = '내장 스냅샷 · 11-28 15:47 기준 · 토큰을 연결하면 실시간';
+    txt.innerHTML = '내장 스냅샷 · ' + SNAP_AT + ' 기준 · 토큰을 연결하면 실시간';
     act.textContent = '토큰 연결';
     renderHint();
   }
@@ -1809,11 +1797,7 @@
     if (state.live){
       var doing = state.live.issues.filter(function(i){
         if (!i || i.state === 'closed') return false;
-        if (statusOfIssue(i) !== 'doing') return false;
-        var owner = ownerOfIssue(i);
-        if (owner) return owner === key;
-        var asg = assigneesOf(i);
-        return asg.length ? asg[0] === key : false;
+        return statusOfIssue(i) === 'doing' && issueWho(i) === key;
       }).slice(0, 4);
       live =
         '<div class="wk-i wk-live"><b>🛠 진행 중</b><span class="wt">' +
@@ -1833,17 +1817,141 @@
       '</div>';
   }
 
+  /* =========================================================
+     📋 작업 내역 — 진행 중( todo·doing ) / 처리했던 일( done·closed )
+     ========================================================= */
+  function allIssues(){
+    return (state.live ? state.live.issues : snapshotIssues()).slice();
+  }
+  function allComments(){
+    return (state.live ? (state.live.comments || []) : snapshotComments()).slice();
+  }
+  function allFiles(){
+    return (state.live ? (state.live.files || []) : SNAP_FILES).slice();
+  }
+  function issueStatus(i){
+    return statusOfIssue(i) || (i.state === 'closed' ? 'done' : 'todo');
+  }
+  function issueWho(i){
+    return ownerOfIssue(i) || assigneesOf(i)[0] || 'sonseonghun1';
+  }
+  function issueDoneAt(i){
+    return i.closed_at || i.updated_at || i.created_at;
+  }
+  /* 이슈 본문·댓글에 적힌 결과물 경로 중 저장소에 실제로 있는 파일 */
+  var OUT_RE = /outputs\/[A-Za-z0-9_\-./가-힣]+\.(?:md|txt|csv|tsv|png|jpe?g|pdf|html|json|zip|xlsx?|docx?|pptx?)/g;
+  function outputsOf(i){
+    var files = allFiles();
+    if (!files.length) return [];
+    var texts = [String(i.body || '')];
+    allComments().forEach(function(c){
+      if (commentIssueNo(c) === String(i.number)) texts.push(String(c.body || ''));
+    });
+    var blob = texts.join('\n');
+    var hit = {}, m;
+    OUT_RE.lastIndex = 0;
+    while ((m = OUT_RE.exec(blob))){
+      hit[m[0].replace(/[.,)]+$/, '')] = 1;
+    }
+    return Object.keys(hit).filter(function(path){
+      return files.some(function(f){ return f.path === path; });
+    }).slice(0, 3);
+  }
+
+  var TASK_TABS = [
+    {k:'all',  label:'전체'},
+    {k:'open', label:'진행 중'},
+    {k:'done', label:'완료'}
+  ];
+  var taskFilter = 'all';
+
+  function taskRow(i){
+    var st = issueStatus(i);
+    var who = issueWho(i);
+    var p = PEOPLE[who] || PEOPLE.sonseonghun1;
+    var outs = outputsOf(i);
+    var meta = st === 'done'
+      ? ('완료 ' + fmtTime(issueDoneAt(i)))
+      : ((st === 'doing' ? '진행 중' : '대기') + ' · ' + fmtTime(i.created_at) + ' 등록');
+    var url = REPO_URL + '/issues/' + i.number;
+    return '<div class="trow" data-issue="' + i.number + '">' +
+      '<span class="tav">' + pickleSVG(p, 23) + '</span>' +
+      '<div class="tb">' +
+        '<a class="tt" href="' + url + '" target="_blank" rel="noopener">' + esc(stripHead(i.title)) + '</a>' +
+        '<div class="tm">' +
+          '<span class="tw">' + (p.rainbow ? '🌈 ' : '') + esc(p.name) + '</span>' +
+          '<span class="chip sm st-' + st + '">' + esc(STATUS_TXT[st] || st) + '</span>' +
+          '<span>' + esc(meta) + '</span>' +
+          '<a class="gh" href="' + url + '" target="_blank" rel="noopener">#' + i.number + ' ↗</a>' +
+        '</div>' +
+        (outs.length
+          ? '<div class="to">' + outs.map(function(f){
+              return '<a href="' + REPO_URL + '/blob/main/' + encodeURI(f) + '" target="_blank" rel="noopener">📄 ' +
+                esc(f.replace(/^outputs\//, '')) + '</a>';
+            }).join('') + '</div>'
+          : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  function tasksSheetHTML(){
+    var list = allIssues();
+    var open = list.filter(function(i){ var st = issueStatus(i); return st === 'todo' || st === 'doing'; });
+    var done = list.filter(function(i){ return issueStatus(i) === 'done'; });
+    open.sort(function(a, b){
+      var ra = issueStatus(a) === 'doing' ? 0 : 1, rb = issueStatus(b) === 'doing' ? 0 : 1;
+      if (ra !== rb) return ra - rb;
+      return new Date(b.created_at) - new Date(a.created_at);
+    });
+    done.sort(function(a, b){ return new Date(issueDoneAt(b)) - new Date(issueDoneAt(a)); });
+
+    var counts = {all:list.length, open:open.length, done:done.length};
+    var tabs = TASK_TABS.map(function(t){
+      return '<button class="ttab' + (taskFilter === t.k ? ' on' : '') + '" type="button" ' +
+        'data-act="tasktab" data-f="' + t.k + '" aria-pressed="' + (taskFilter === t.k ? 'true' : 'false') + '">' +
+        t.label + '<b>' + counts[t.k] + '</b></button>';
+    }).join('');
+
+    var html = '<div class="ttabs" role="group" aria-label="작업 내역 필터">' + tabs + '</div>';
+    if (taskFilter !== 'done'){
+      html += '<div class="tgroup">🛠 진행 중 <span class="n">' + open.length + '</span></div>' +
+        (open.length
+          ? '<div class="tlist">' + open.map(taskRow).join('') + '</div>'
+          : '<div class="none">진행 중인 일감이 없습니다.</div>');
+    }
+    if (taskFilter !== 'open'){
+      html += '<div class="tgroup">✅ 처리했던 일 <span class="n">' + done.length + '</span></div>' +
+        (done.length
+          ? '<div class="tlist">' + done.map(taskRow).join('') + '</div>'
+          : '<div class="none">아직 끝난 일이 없습니다.</div>');
+    }
+    html += '<div class="note" style="margin-top:14px">' +
+      (state.live
+        ? 'GitHub 이슈 기준으로 모은 목록입니다. 제목을 누르면 이슈가, 결과물 이름을 누르면 파일이 열립니다.'
+        : '내장 스냅샷 기준입니다. 🔑 토큰을 연결하면 실제 작업 내역이 실시간으로 채워집니다.') +
+      '</div>';
+    return html;
+  }
+  function renderTasksSheet(){
+    var body = $('sheetBody');
+    if (!body) return;
+    var top = body.scrollTop;
+    body.innerHTML = tasksSheetHTML();
+    body.scrollTop = top;
+  }
+  function openTasks(filter){
+    if (filter === 'all' || filter === 'open' || filter === 'done') taskFilter = filter;
+    openSheet('📋 작업 내역', tasksSheetHTML());
+  }
+
   /* ── 팀원 시트 ── */
   function openMember(key){
     var p = PEOPLE[key];
     if (!p) return;
-    var all = [];
-    if (state.live){
-      all = state.live.issues.filter(function(i){ return ownerOfIssue(i) === key; });
-    }
-    var issues = all.filter(function(i){
-      return i.state !== 'closed' && statusOfIssue(i) !== 'done';
-    });
+    var mine = allIssues().filter(function(i){ return issueWho(i) === key; });
+    var issues = mine.filter(function(i){ return issueStatus(i) !== 'done'; });
+    var doneList = mine.filter(function(i){ return issueStatus(i) === 'done'; })
+      .sort(function(a, b){ return new Date(issueDoneAt(b)) - new Date(issueDoneAt(a)); });
     var rows = issues.length
       ? '<div class="ilist">' + issues.map(function(i){
           var st = statusOfIssue(i) || 'todo';
@@ -1857,10 +1965,30 @@
           ? '아직 배정된 이슈가 없습니다. 아래에서 이 피클 앞으로 첫 지시를 보내면 이슈로 올라갑니다.'
           : '토큰을 연결하면 배정된 이슈를 여기에서 실시간으로 보여줍니다.') + '</div>';
 
-    var c = countsByOwner()[key] || {open:0, todo:0, doing:0, done:0};
-    var loadTxt = state.live
-      ? ('<b>' + c.open + '</b>건 열림 · todo ' + c.todo + (c.doing ? ' · doing ' + c.doing : '') + ' · 끝난 일감 ' + c.done)
-      : '토큰을 연결하면 표시됩니다';
+    var todoN = issues.filter(function(i){ return issueStatus(i) === 'todo'; }).length;
+    var doingN = issues.filter(function(i){ return issueStatus(i) === 'doing'; }).length;
+    var loadTxt = '<b>' + issues.length + '</b>건 열림 · todo ' + todoN +
+      (doingN ? ' · doing ' + doingN : '') + ' · 끝난 일 ' + doneList.length;
+    var doneHTML = doneList.length
+      ? '<details class="acc"><summary>완료한 일 ' + doneList.length + '건 펼쳐 보기</summary><div>' +
+          '<div class="ilist">' + doneList.map(function(i){
+            var outs = outputsOf(i);
+            return '<div class="irow">' +
+              '<span class="num">#' + i.number + '</span>' +
+              '<span><a class="t" href="' + REPO_URL + '/issues/' + i.number + '" target="_blank" rel="noopener">' +
+                esc(stripHead(i.title)) + '</a>' +
+              '<span class="m"><span class="chip st-done sm">done</span>' +
+              '<span>' + esc(fmtTime(issueDoneAt(i))) + ' 완료</span>' +
+              (outs.length ? outs.map(function(f){
+                return '<a href="' + REPO_URL + '/blob/main/' + encodeURI(f) + '" target="_blank" rel="noopener" style="color:#1B6B45;font-weight:800">📄 ' +
+                  esc(f.replace(/^outputs\//, '')) + '</a>';
+              }).join('') : '') +
+              '</span></span></div>';
+          }).join('') + '</div>' +
+        '</div></details>'
+      : '<div class="none">' + (state.live
+          ? '이 피클이 아직 완료한 일은 없습니다.'
+          : '내장 스냅샷에 이 피클이 끝낸 일이 없습니다.') + '</div>';
 
     var joinTxt = p.ok
       ? '<span class="okdot">✅ 합류 완료</span>'
@@ -1891,6 +2019,7 @@
       '<h3 class="sh">한도 여유 설정 <span class="n">매일 04:00 리셋</span></h3>' +
       quotaSectionHTML(key) +
       '<h3 class="sh">배정된 이슈 <span class="n">' + (issues.length || '0') + '</span></h3>' + rows +
+      '<h3 class="sh">✅ 완료한 일 <span class="n">' + doneList.length + '</span></h3>' + doneHTML +
       note +
       '<div class="btn-row2">' +
         '<button class="btn primary" data-act="filter" data-who="' + key + '">이 피클만 보기</button>' +
@@ -2085,28 +2214,14 @@
 
   function addSent(text, target, project, issue, autoInfo){
     var t = nowISO();
-    var whoTxt = (target === 'all' ? '[공용]' : TARGET_LABEL[target]);
+    // 방금 보낸 지시는 성훈님 말풍선 하나로만 남긴다 (이슈 카드·접수 카드 없음)
+    // 실시간 동기화에서 같은 이슈가 확인되면 이 반향 말풍선은 접힌다
     var me = {
-      kind:'me', t:t, text:text,
-      chips:[
-        {type:'label', v: autoInfo ? ('자동 배정 → ' + whoTxt) : whoTxt},
-        {type:'label', v: PROJECT_LABEL[project]},
-        {type:'issue', n:issue.number, title:'방금 생성'}
-      ]
+      kind:'me', t:t, text:text, echoOf:issue.number, full:issue.title || '',
+      chips:[{type:'issue', n:issue.number, title:'올라감'}]
     };
-    var ack = {
-      kind:'msg', who:'sonseonghun1', t:t, echoOf:issue.number,
-      text:'지시 접수 — ' + whoTxt + ' 이슈로 올렸습니다.' +
-        (autoInfo ? ' 한도 여유 기준 자동 배정으로 ' + PEOPLE[target].name + '에게 배정했습니다.' : '') +
-        ' 담당 피클이 확인하면 status:doing으로 바꾸고 결과물을 outputs/에 남깁니다.',
-      chips:[
-        {type:'issue', n:issue.number, title:issue.title || ''},
-        {type:'status', v:'todo'}
-      ],
-      react:[{e:'🙌', n:1}]
-    };
-    state.localItems.push(me, ack);
-    state.items.push(me, ack);
+    state.localItems.push(me);
+    state.items.push(me);
     render();
     scrollBottom(true);
   }
@@ -2134,6 +2249,7 @@
   });
 
   $('btnToken').addEventListener('click', openToken);
+  $('btnTasks').addEventListener('click', function(){ openTasks(); });
   $('btnOutputs').addEventListener('click', openOutputs);
   $('btnClear').addEventListener('click', clearTimeline);
   $('btnRefresh').addEventListener('click', function(){
@@ -2195,6 +2311,8 @@
         (state.quota.map[sheetWho].pct == null ? '' : ' ' + state.quota.map[sheetWho].pct + '%'));
       return;
     }
+    if (act === 'tasktab'){ taskFilter = b.getAttribute('data-f') || 'all'; renderTasksSheet(); return; }
+    if (act === 'tasks'){ closeSheet(); setTimeout(function(){ openTasks(); }, 120); return; }
     if (act === 'token'){ closeSheet(); setTimeout(openToken, 120); return; }
     if (act === 'outputs'){ closeSheet(); setTimeout(openOutputs, 120); return; }
     if (act === 'refresh'){ closeSheet(); loadLive(false); return; }
