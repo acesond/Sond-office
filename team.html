@@ -507,6 +507,35 @@
   .wk-live .wln+.wln{margin-top:3px}
   .wk-live .none-live{color:var(--muted);font-weight:600}
 
+  /* 💬 이 피클이 남긴 메시지 */
+  .pms{display:flex;flex-direction:column;gap:7px}
+  .pm{border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:9px 11px}
+  .pm.mk-raise{border-color:#F2DFB0;background:#FFFCF4}
+  .pm.mk-doing{border-color:#CBDEFB;background:#F7FAFF}
+  .pm.mk-done{border-color:#C6EAD7;background:#F6FDF9}
+  .pmh{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+  .pmh .mk{margin-bottom:0}
+  .pmh .pmt{margin-left:auto;flex:0 0 auto;font-size:9.8px;font-weight:750;color:var(--muted2);white-space:nowrap}
+  .pmb{
+    font-size:11.8px;color:#3A3648;line-height:1.6;word-break:break-word;
+    display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .pm.open .pmb{display:block;overflow:visible}
+  .pmb p{margin:0}
+  .pmb p + p{margin-top:4px}
+  .pmb .em{color:var(--violet-deep);font-weight:800}
+  .pmtag{
+    display:inline-block;max-width:100%;margin-top:7px;font-size:9.8px;font-weight:800;
+    color:#5B34C9;background:#F4F0FF;border-radius:6px;padding:2px 7px;text-decoration:none;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:top;
+  }
+  .pmexp{
+    margin:6px 0 0;border:0;background:transparent;padding:0;
+    color:var(--violet-ink);font-size:10.4px;font-weight:800;min-height:0;
+  }
+  .pmn{margin-top:7px;font-size:10.2px;color:var(--muted2);font-weight:700;line-height:1.5}
+  .mk.mk-say{background:#F4F2FB;border-color:#E6E2F2;color:#5A5570}
+
   /* 한도 여유 설정 */
   .qset{background:#F8F7FD;border:1px solid var(--line);border-radius:14px;padding:11px 12px 12px}
   .qbtns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
@@ -1824,6 +1853,62 @@
       '</div>';
   }
 
+  /* ── 💬 이 피클이 남긴 메시지 ── */
+  var PMSG_LIMIT = 10;
+  function pickleMessages(key){
+    var byNum = {};
+    allIssues().forEach(function(i){ byNum[String(i.number)] = i; });
+    var list = [];
+    allComments().forEach(function(cm){
+      var num = commentIssueNo(cm);
+      var iss = num ? (byNum[num] || null) : null;
+      if (whoFromComment(cm.body, iss) !== key) return;
+      var text = commentSay(cm.body);
+      if (!text) return;
+      list.push({
+        t: cm.created_at,
+        mark: markOfComment(cm.body),
+        text: text,
+        tag: num ? {n:Number(num), title: iss ? stripHead(iss.title) : ''} : null
+      });
+    });
+    list.sort(function(a, b){ return itemTs(b) - itemTs(a); });
+    return list;
+  }
+  function pickleMsgHTML(m){
+    var long = m.text.length > 140 || m.text.split('\n').length > 4;
+    return '<div class="pm' + (m.mark ? ' mk-' + m.mark.k : '') + '">' +
+      '<div class="pmh">' +
+        (m.mark
+          ? '<span class="mk mk-' + m.mark.k + '">' + esc(m.mark.label) + '</span>'
+          : '<span class="mk mk-say">💬 메시지</span>') +
+        '<span class="pmt">' + esc(fmtTime(m.t)) + '</span>' +
+      '</div>' +
+      '<div class="pmb">' + bubbleText(m.text) + '</div>' +
+      (long ? '<button class="pmexp" type="button" data-act="pmexp" aria-expanded="false">더 보기</button>' : '') +
+      (m.tag
+        ? '<a class="pmtag" href="' + REPO_URL + '/issues/' + m.tag.n + '" target="_blank" rel="noopener">#' +
+            m.tag.n + (m.tag.title ? ' ' + esc(m.tag.title) : '') + ' ↗</a>'
+        : '') +
+    '</div>';
+  }
+  function messagesHTML(key){
+    var list = pickleMessages(key);
+    var html = '<h3 class="sh">💬 이 피클이 남긴 메시지 <span class="n">' + list.length + '</span></h3>';
+    if (!list.length){
+      return html + '<div class="none">아직 이 피클이 남긴 메시지가 없습니다.</div>';
+    }
+    var shown = list.slice(0, PMSG_LIMIT);
+    html += '<div class="pms">' + shown.map(pickleMsgHTML).join('') + '</div>';
+    var foot = [];
+    if (list.length > shown.length) foot.push('최근 ' + shown.length + '건 표시 · 전체 ' + list.length + '건');
+    foot.push(state.live
+      ? 'GitHub 댓글에서 이 피클 몫으로 분류된 메시지만 모았습니다.'
+      : '내장 스냅샷 기준입니다. 🔑 토큰을 연결하면 실시간 댓글이 쌓입니다.');
+    html += '<div class="pmn">' + esc(foot.join(' · ')) + '</div>';
+    return html;
+  }
+
   /* =========================================================
      📋 작업 내역 — 진행 중( todo·doing ) / 처리했던 일( done·closed )
      ========================================================= */
@@ -2023,6 +2108,7 @@
         '<dt>일감</dt><dd>' + loadTxt + '</dd>' +
       '</dl>' +
       workHTML(key) +
+      messagesHTML(key) +
       '<h3 class="sh">한도 여유 설정 <span class="n">매일 04:00 리셋</span></h3>' +
       quotaSectionHTML(key) +
       '<h3 class="sh">배정된 이슈 <span class="n">' + (issues.length || '0') + '</span></h3>' + rows +
@@ -2316,6 +2402,14 @@
       renderHint();
       toast(PEOPLE[sheetWho].name + ' 한도 = ' + QUOTA_STATES[qs].label +
         (state.quota.map[sheetWho].pct == null ? '' : ' ' + state.quota.map[sheetWho].pct + '%'));
+      return;
+    }
+    if (act === 'pmexp'){
+      var pm = b.closest('.pm');
+      if (!pm) return;
+      var opened = pm.classList.toggle('open');
+      b.textContent = opened ? '접기' : '더 보기';
+      b.setAttribute('aria-expanded', opened ? 'true' : 'false');
       return;
     }
     if (act === 'tasktab'){ taskFilter = b.getAttribute('data-f') || 'all'; renderTasksSheet(); return; }
