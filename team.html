@@ -1162,7 +1162,7 @@
         '<div><b>내장 스냅샷으로 보고 있어요.</b> 2026-11-28 11:30 기준 저장소 상태입니다. ' +
         'GitHub 토큰을 한 번 넣어 두면 이 방이 실시간으로 바뀌고, 아래 입력창의 지시가 실제 이슈로 올라갑니다.' +
         '<div class="btn-row">' +
-          '<button class="mini" data-act="token">🔑 토큰 설정</button>' +
+          '<button class="mini" data-act="token">🔑 GitHub 토큰 설정</button>' +
           '<button class="mini" data-act="outputs">🗂 결과물</button>' +
         '</div></div></div>');
     } else if (state.live){
@@ -1393,7 +1393,7 @@
     if (!state.token){
       html = '<div class="none">결과물 목록은 GitHub 토큰을 연결하면 실시간으로 보여줍니다.<br>' +
         '지금은 저장소의 <b>outputs/</b> 폴더를 직접 열어 보세요.' +
-        '<div class="btn-row2"><button class="btn primary" data-act="token">🔑 토큰 설정</button>' +
+        '<div class="btn-row2"><button class="btn primary" data-act="token">🔑 GitHub 토큰 설정</button>' +
         '<a class="btn" href="' + REPO_URL + '/tree/main/outputs" target="_blank" rel="noopener">저장소 열기 ↗</a></div></div>';
     } else if (!files.length){
       html = '<div class="none">아직 <b>outputs/</b>에 결과물 파일이 없습니다. 첫 일감이 끝나면 여기에 쌓입니다.<br>' +
@@ -1428,7 +1428,7 @@
         '라벨: ' + msg.labels.map(function(l){ return '<span class="chip chip-label" style="margin:2px 2px 0 0">' + esc(l) + '</span>'; }).join('') +
       '</div>' +
       '<div class="btn-row2">' +
-        '<button class="btn primary" data-act="token">🔑 토큰 설정</button>' +
+        '<button class="btn primary" data-act="token">🔑 GitHub 토큰 설정</button>' +
         '<button class="btn" data-act="copy" data-prompt="' + esc(prompt) + '">📋 복사해서 손디에게 전달</button>' +
       '</div>' +
       '<div class="note">복사한 내용을 이 방에 그대로 붙여넣으면 대장(손디)이 이슈로 올려 드립니다.</div>';
