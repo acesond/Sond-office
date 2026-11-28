@@ -299,14 +299,16 @@
   .chip-label{background:#F6F3FF;border-color:#E6DEFF;color:#5B34C9}
   .chip-who{background:#F4F2FB;border-color:#E6E2F2;color:#5A5570;font-weight:800}
 
-  /* 댓글 말풍선 위에 붙는 이슈 태그 (#번호 제목) */
+  /* 댓글 말풍선 위에 붙는 이슈 태그 (#번호 제목) + 손들기·완료 배지 */
+  .bhead{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin-bottom:7px}
   .btag{
-    display:inline-block;max-width:100%;vertical-align:top;
+    display:inline-block;min-width:0;flex:0 1 auto;vertical-align:top;
     font-size:9.5px;font-weight:800;letter-spacing:-.01em;line-height:1.4;
     color:#7A7590;background:#F4F2FB;border-radius:6px;padding:1px 6px;
-    margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .btag:active{background:#EAE6F7}
+  .bhead .mk{margin-bottom:0;flex:0 0 auto}
   .chip.sm{font-size:9.4px;padding:1px 6px;border-radius:6px}
 
   /* ✋ 손들기 · ✅ 완료 · ▶ 착수 표시 */
@@ -1568,11 +1570,15 @@
               (it.live ? '<span class="h">· 실시간</span>' : '') +
             '</div>' +
             '<div class="bubble' + (it.mark ? ' mk-' + it.mark.k : '') + '">' +
-              (it.tag
-                ? '<a class="btag" href="' + REPO_URL + '/issues/' + it.tag.n + '" target="_blank" rel="noopener">#' +
-                    it.tag.n + (it.tag.title ? ' ' + esc(it.tag.title) : '') + '</a>'
+              ((it.tag || it.mark)
+                ? '<div class="bhead">' +
+                    (it.tag
+                      ? '<a class="btag" href="' + REPO_URL + '/issues/' + it.tag.n + '" target="_blank" rel="noopener">#' +
+                          it.tag.n + (it.tag.title ? ' ' + esc(it.tag.title) : '') + '</a>'
+                      : '') +
+                    (it.mark ? '<span class="mk mk-' + it.mark.k + '">' + esc(it.mark.label) + '</span>' : '') +
+                  '</div>'
                 : '') +
-              (it.mark ? '<span class="mk mk-' + it.mark.k + '">' + esc(it.mark.label) + '</span>' : '') +
               bubbleText(it.text) +
               (it.chips && it.chips.length
                 ? '<div class="chips">' + it.chips.map(chipHTML).join('') + '</div>'
