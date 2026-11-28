@@ -324,6 +324,35 @@
   .chip.st-doing{background:var(--doing-bg);border-color:#CBDEFB;color:var(--doing)}
   .chip.st-done{background:var(--done-bg);border-color:#C6EAD7;color:var(--done)}
   .chip-label{background:#F6F3FF;border-color:#E6DEFF;color:#5B34C9}
+  .chip-who{background:#F4F2FB;border-color:#E6E2F2;color:#5A5570;font-weight:800}
+
+  /* ✋ 손들기 · ✅ 완료 · ▶ 착수 표시 */
+  .mk{
+    display:inline-flex;align-items:center;gap:4px;max-width:100%;
+    font-size:10px;font-weight:800;letter-spacing:-.01em;line-height:1.4;
+    border-radius:999px;padding:2px 8px;margin-bottom:7px;
+    border:1px solid transparent;white-space:nowrap;
+  }
+  .mk-raise{background:#FFF4DC;border-color:#F2DFB0;color:#8A5B09}
+  .mk-doing{background:#EAF2FE;border-color:#CBDEFB;color:#1B4E9B}
+  .mk-done{background:#E4F6EC;border-color:#C6EAD7;color:#0B7A3F}
+  .bubble.mk-raise{box-shadow:inset 0 0 0 1px #F2DFB0, 0 1px 3px rgba(42,33,64,.06)}
+  .bubble.mk-doing{box-shadow:inset 0 0 0 1px #CBDEFB, 0 1px 3px rgba(42,33,64,.06)}
+  .bubble.mk-done{box-shadow:inset 0 0 0 1px #C6EAD7, 0 1px 3px rgba(42,33,64,.06)}
+
+  /* 🧹 비우기 배지 */
+  .clearedbar{
+    align-self:stretch;display:flex;align-items:center;gap:6px;cursor:pointer;
+    background:#F6F3FF;border:1px dashed #D9CFFF;border-radius:13px;
+    padding:7px 8px 7px 11px;font-size:10.6px;font-weight:750;color:#5B34C9;
+    line-height:1.4;
+  }
+  .clearedbar .undo{
+    margin-left:auto;flex:0 0 auto;border:0;background:#fff;color:var(--violet-deep);
+    font-size:10.4px;font-weight:800;border-radius:9px;padding:5px 9px;
+    box-shadow:0 1px 4px rgba(108,77,255,.16);
+  }
+  .clearedbar .undo:active{background:var(--violet-soft)}
 
   /* system / hint cards */
   .sys{
@@ -591,6 +620,7 @@
         <p>피클팀 공용 작업방</p>
       </div>
       <div class="hd-act">
+        <button class="icbtn" id="btnClear" aria-label="대화 비우기(지난 말풍선 숨기기)" title="대화 비우기">🧹</button>
         <button class="icbtn" id="btnOutputs" aria-label="결과물 폴더 보기" title="결과물(outputs) 보기">🗂</button>
         <button class="icbtn" id="btnRefresh" aria-label="새로고침" title="GitHub에서 새로고침">🔄</button>
         <button class="icbtn" id="btnToken" aria-label="GitHub 토큰 설정" title="GitHub 토큰 설정">🔑</button>
@@ -670,6 +700,7 @@
   var TOKEN_KEY = 'pickle_team_gh_token';
   var TS_KEY    = 'pickle_team_last_sync';
   var PREF_KEY  = 'pickle_team_prefs';
+  var CLEAR_KEY = 'pickle_team_cleared_at';
 
   var PEOPLE = {
     sonseonghun1: {
@@ -734,6 +765,10 @@
     renderedIssues: {},
     quota: null,
     quotaTimer: null,
+    clearedAt: (function(){
+      var v = parseInt(readLS(CLEAR_KEY) || '', 10);
+      return (v > 0) ? v : 0;
+    })(),
     prefs: (function(){
       try { return JSON.parse(readLS(PREF_KEY) || '{}'); } catch(e){ return {}; }
     })()
@@ -1098,7 +1133,7 @@
 
     var jobs = [
       gh('/repos/' + REPO + '/issues?state=all&per_page=30&sort=updated'),
-      gh('/repos/' + REPO + '/issues/comments?per_page=50&sort=created'),
+      gh('/repos/' + REPO + '/issues/comments?sort=created&direction=desc&per_page=50'),
       gh('/repos/' + REPO + '/commits?per_page=10'),
       gh('/repos/' + REPO + '/git/trees/main?recursive=1')
     ];
@@ -1125,22 +1160,49 @@
           return false;
         }
 
-        state.live = {
-          issues: (issues || []).filter(function(i){ return !i.pull_request; }),
-          comments: comments || [],
-          commits: commits || [],
-          files: ((tree && tree.tree) || []).filter(function(f){ return f.type === 'blob' && f.path.indexOf('outputs/') === 0 && f.path !== 'outputs/.gitkeep'; }),
-          at: nowISO()
-        };
-        writeLS(TS_KEY, state.live.at);
-        state.loading = false;
-        setRefreshSpin(false);
-        buildItems();
-        render();
-        renderMembers();
-        renderLiveBar();
-        if (!quiet) toast('GitHub에서 새로고침했습니다', 'ok');
-        return true;
+        var list = (issues || []).filter(function(i){ return !i.pull_request; });
+        var base = comments || [];
+
+        // 최근 50건 밖에 있는 이슈는 이슈별 댓글을 따로 받아 보완한다
+        var have = {};
+        base.forEach(function(c){ var n = commentIssueNo(c); if (n) have[n] = 1; });
+        var need = list.filter(function(i){
+          return (i.comments || 0) > 0 && !have[i.number];
+        }).slice(0, 8);
+
+        return Promise.all(need.map(function(i){
+          return gh('/repos/' + REPO + '/issues/' + i.number + '/comments?per_page=100&sort=created')
+            .then(function(v){ return v || []; }, function(){ return []; });
+        })).then(function(parts){
+          var all = base.slice();
+          parts.forEach(function(p){ all = all.concat(p); });
+          var seen = {}, merged = [];
+          all.forEach(function(c){
+            if (!c || c.id == null) return;
+            var k = String(c.id);
+            if (seen[k]) return;
+            seen[k] = 1;
+            merged.push(c);
+          });
+          merged.sort(function(a,b){ return new Date(a.created_at) - new Date(b.created_at); });
+
+          state.live = {
+            issues: list,
+            comments: merged,
+            commits: commits || [],
+            files: ((tree && tree.tree) || []).filter(function(f){ return f.type === 'blob' && f.path.indexOf('outputs/') === 0 && f.path !== 'outputs/.gitkeep'; }),
+            at: nowISO()
+          };
+          writeLS(TS_KEY, state.live.at);
+          state.loading = false;
+          setRefreshSpin(false);
+          buildItems();
+          render();
+          renderMembers();
+          renderLiveBar();
+          if (!quiet) toast('GitHub에서 새로고침했습니다 · 댓글 ' + merged.length + '건', 'ok');
+          return true;
+        });
       })
       .catch(function(e){
         state.loading = false;
@@ -1177,82 +1239,118 @@
     }
     return null;
   }
-  function guessAuthor(text){
-    var head = String(text || '').split('\n')[0] || '';
-    if (/벨벳/.test(head)) return 'belbes8';
-    if (/엄마/.test(head)) return 'eomma70';
-    if (/3번/.test(head)) return 'sond3';
-    if (/손디/.test(head)) return 'sonseonghun1';
-    if (/벨벳/.test(text)) return 'belbes8';
-    if (/엄마/.test(text)) return 'eomma70';
+  /* 댓글 → 피클 매핑
+     · 말머리 [손디]/[대장] = 대장(ㅅ) · [벨벳] = 벨벳(ㅂ) · [엄마] = 엄마(ㅇ) · [3번] = 3번(3)
+     · 말머리가 없으면 그 이슈의 owner:* 라벨(또는 assignee)을 따르고, 그것도 없으면 대장 */
+  var HEAD_MAP = [
+    {key:'sonseonghun1', re:/(손디|대장)/},
+    {key:'belbes8',      re:/(벨벳)/},
+    {key:'eomma70',      re:/(엄마)/},
+    {key:'sond3',        re:/(3번)/}
+  ];
+  function headKey(node){
+    var t = String(node || '').trim();
+    if (!t) return null;
+    for (var i = 0; i < HEAD_MAP.length; i++){
+      if (HEAD_MAP[i].re.test(t)) return HEAD_MAP[i].key;
+    }
+    return null;
+  }
+  function headOf(text, rows){
+    var lines = String(text || '').split('\n');
+    var picked = lines.slice(0, rows || 1).join('\n');
+    var m = /[\[\(（]\s*(손디|대장|벨벳|엄마|3번)\s*[\]\)）]/.exec(picked);
+    return m ? headKey(m[1]) : null;
+  }
+  function assigneesOf(i){
+    return ((i && i.assignees) || []).map(function(a){ return a && a.login; })
+      .filter(function(l){ return l && PEOPLE[l]; });
+  }
+  function whoFromComment(body, issue){
+    // 1) 댓글 맨 앞 말머리  2) 앞 두 줄의 말머리
+    var key = headOf(body, 1) || headOf(body, 2);
+    if (key) return key;
+    // 3) 이슈 담당(owner:* 라벨 → assignee)  4) 그래도 없으면 대장
+    if (issue){
+      var owner = ownerOfIssue(issue);
+      if (owner) return owner;
+      var asg = assigneesOf(issue);
+      if (asg.length) return asg[0];
+    }
     return 'sonseonghun1';
+  }
+  /* ✋ 손들기 · ✅ 완료 · ▶ 착수를 말풍선에 표시 */
+  function markOfComment(body){
+    var head = String(body || '').split('\n').filter(function(x){ return x.trim(); })[0] || '';
+    if (/✅/.test(head) || /완료했습니다/.test(head)) return {k:'done', label:'✅ 완료'};
+    if (/✋/.test(head) || /(맡겠습니다|맡아서|손들)/.test(head)) return {k:'raise', label:'✋ 손들기'};
+    if (/(🙌|착수|시작합니다)/.test(head)) return {k:'doing', label:'▶ 착수'};
+    return null;
+  }
+  function commentIssueNo(cm){
+    var m = /\/issues\/(\d+)(?:\/comments)?$/.exec((cm && cm.issue_url) || '');
+    return m ? m[1] : '';
+  }
+  function itemTs(it){
+    var v = (it && it.t) ? new Date(it.t).getTime() : 0;
+    return isNaN(v) ? 0 : v;
   }
 
   function buildItems(){
-    var items = snapshotItems().concat(state.localItems || []);
     var live = state.live;
+    var items = [];
 
-    if (live){
-      // 새 커밋 (스냅샷에 없는 것)
-      live.commits.forEach(function(c){
-        var sha = (c.sha || '').slice(0,7);
-        if (SNAP_COMMITS[sha]) return;
-        if (state.renderedIssues['c:' + sha]) return;
-        items.push({
-          kind:'msg', who:'sonseonghun1', t:c.commit.author.date, live:true,
-          text:'커밋 · ' + (c.commit.message || '').split('\n')[0],
-          chips:[{type:'commit', sha:sha}]
-        });
-      });
+    if (!live){
+      // 토큰이 없을 때만 내장 스냅샷으로 보여준다 (연결되면 실제 이슈·댓글만)
+      items = snapshotItems();
+    } else {
+      var byNum = {};
 
-      // 새 이슈 (스냅샷 #1 제외, 이 웹앱에서 만든 것 제외) — 피클 카드로
+      // 1) 실제 이슈 → 일감 말풍선
       live.issues.forEach(function(i){
-        if (SNAP_ISSUES[i.number]) return;
-        if (state.renderedIssues[i.number]) return;
-        var who = ownerOfIssue(i) || 'sonseonghun1';
-        var st = statusOfIssue(i) || 'todo';
-        var chips = [{type:'issue', n:i.number, title:i.title},{type:'status', v:st}];
+        byNum[String(i.number)] = i;
         var owner = ownerOfIssue(i);
+        var asg = assigneesOf(i);
+        var who = asg.length ? asg[0] : (owner || 'sonseonghun1');
+        var st = statusOfIssue(i) || (i.state === 'closed' ? 'done' : 'todo');
+        var chips = [{type:'issue', n:i.number, title:i.title},{type:'status', v:st}];
         if (owner) chips.push({type:'label', v:'owner:' + owner});
+        else if (asg.length) chips.push({type:'label', v:'owner:' + asg[0]});
+        var lead = st === 'done' ? '일감 완료 — ' : (st === 'doing' ? '일감 착수 — ' : '일감이 올라왔습니다 — ');
         var bodyFirst = (i.body || '').split('\n').filter(function(x){ return x.trim() && !/^#|^\||^- \[/.test(x.trim()); })[0] || '';
         items.push({
           kind:'msg', who:who, t:i.created_at, live:true,
-          text:'일감을 받았습니다 — ' + i.title + (bodyFirst ? '\n' + bodyFirst.slice(0,140) : ''),
+          text: lead + i.title + (bodyFirst ? '\n' + bodyFirst.slice(0,140) : ''),
           card:{
-            emoji:'📥', title:i.title, sub:'새 일감 · #' + i.number,
-            rows:[['담당', PEOPLE[who].name],['상태', st]],
+            emoji: st === 'done' ? '✅' : (st === 'doing' ? '🛠' : '📥'),
+            title:i.title,
+            sub:'이슈 #' + i.number + (i.state === 'closed' ? ' · 닫힘' : ''),
+            rows:[
+              ['담당', PEOPLE[who].name + (asg.length ? ' · @' + asg[0] : '')],
+              ['상태', st]
+            ],
             link:{label:'이슈 #' + i.number + ' 열기', href:REPO_URL + '/issues/' + i.number}
           },
-          chips:chips
+          chips: chips
         });
-
-        // 이슈 댓글
-        live.comments.filter(function(cm){ return cm.issue_url && cm.issue_url.slice(-String(i.number).length - 1) === '/' + i.number; })
-          .forEach(function(cm){
-            items.push({
-              kind:'msg', who:guessAuthor(cm.body), t:cm.created_at, live:true,
-              text:plainFromMd(cm.body),
-              chips:[{type:'issue', n:i.number, title:'댓글'}]
-            });
-          });
       });
 
-      // 새 댓글 (스냅샷에 없는 것)
+      // 2) 실제 댓글 → 피클 말풍선 (✋ 손들기 / ✅ 완료 / ▶ 착수 표시)
       live.comments.forEach(function(cm){
-        var numMatch = /\/issues\/(\d+)$/.exec(cm.issue_url || '');
-        if (!numMatch) return;
-        var num = numMatch[1];
-        if (!SNAP_ISSUES[num]) return;
-        var key = num + '|' + cm.created_at;
-        if (SNAP_COMMENT_KEYS[key]) return;
+        var num = commentIssueNo(cm);
+        var iss = num ? (byNum[num] || null) : null;
+        var who = whoFromComment(cm.body, iss);
+        var chips = [];
+        if (num) chips.push({type:'issue', n:Number(num), title: iss ? iss.title : '이슈 댓글'});
         items.push({
-          kind:'msg', who:guessAuthor(cm.body), t:cm.created_at, live:true,
-          text:plainFromMd(cm.body),
-          chips:[{type:'issue', n:Number(num), title:'댓글'}]
+          kind:'msg', who:who, t:cm.created_at, live:true,
+          mark: markOfComment(cm.body),
+          text: plainFromMd(cm.body),
+          chips: chips
         });
       });
 
-      // 결과물 파일 (최근 것만)
+      // 3) 결과물 파일 (최근 것만)
       if (live.files.length){
         var recent = live.files.slice(-6).reverse();
         items.push({
@@ -1263,30 +1361,16 @@
       }
     }
 
-    items.sort(function(a,b){ return new Date(a.t) - new Date(b.t); });
+    // 이 웹앱에서 방금 보낸 지시(로컬 반향) — 실시간 이슈가 확인되면 접수 말풍선은 접는다
+    (state.localItems || []).forEach(function(it){
+      if (it.echoOf && live){
+        var hit = live.issues.some(function(i){ return i.number === it.echoOf; });
+        if (hit) return;
+      }
+      items.push(it);
+    });
 
-    // 실시간 데이터가 있으면 스냅샷 말풍선의 이슈 제목·상태를 실제 값으로 맞춘다
-    if (live){
-      var byNum = {};
-      live.issues.forEach(function(i){ byNum[i.number] = i; });
-      items.forEach(function(it){
-        var n = null;
-        (it.chips || []).forEach(function(c){ if (c.type === 'issue') n = c.n; });
-        if (n && byNum[n]){
-          (it.chips || []).forEach(function(c){
-            if (c.type === 'issue') c.title = byNum[n].title;
-            if (c.type === 'status') c.v = statusOfIssue(byNum[n]) || c.v;
-          });
-          if (it.card && it.card.rows){
-            it.card.rows.forEach(function(r){
-              if (r[0] === '상태') r[1] = statusOfIssue(byNum[n]) || r[1];
-              if (r[0] === '제목') r[1] = byNum[n].title;
-            });
-          }
-        }
-      });
-    }
-
+    items.sort(function(a,b){ return itemTs(a) - itemTs(b); });
     state.items = items;
   }
 
@@ -1388,22 +1472,16 @@
   function render(){
     var tl = $('timeline');
     var stick = nearBottom();
+    var clearedAt = state.clearedAt || 0;
+    var hidden = 0;
     var filtered = [];
     state.items.forEach(function(it, idx){
+      if (clearedAt && itemTs(it) < clearedAt){ hidden++; return; }
       if (!state.filter) { filtered.push({it:it, i:idx}); return; }
       if (it.kind === 'msg' && it.who === state.filter) filtered.push({it:it, i:idx});
     });
 
-    if (!filtered.length){
-      tl.innerHTML = '<div class="empty"><span class="big">💬</span>' +
-        (state.filter
-          ? esc(PEOPLE[state.filter].name) + ' 피클의 말풍선이 아직 없습니다.<br>아래에서 첫 지시를 보내 보세요.'
-          : '아직 말풍선이 없습니다.') + '</div>';
-      renderFilterBar();
-      return;
-    }
     var out = [];
-    var lastDay = '';
 
     // 안내 카드 (맨 위)
     if (!state.token){
@@ -1423,6 +1501,36 @@
         '<div class="btn-row"><button class="mini" data-act="refresh">🔄 새로고침</button></div></div></div>');
     }
 
+    // 비우기 배지
+    if (clearedAt){
+      out.push('<div class="clearedbar" data-act="unclear" role="button" tabindex="0" title="눌러서 이전 대화 다시 보기">' +
+        '<span aria-hidden="true">🧹</span>' +
+        '<span>' + (hidden ? '이전 대화 ' + hidden + '건 숨김' : '이전 대화를 비웠어요') + '</span>' +
+        '<button class="undo" type="button" data-act="unclear">다시 보기</button>' +
+      '</div>');
+    }
+
+    if (!filtered.length){
+      var emptyMsg;
+      if (state.filter){
+        emptyMsg = esc(PEOPLE[state.filter].name) + ' 피클의 말풍선이 아직 없습니다.<br>아래에서 첫 지시를 보내 보세요.';
+      } else if (state.live){
+        emptyMsg = clearedAt
+          ? '이전 대화를 모두 숨겼습니다.<br>새 소식이 오면 여기부터 쌓입니다.'
+          : '저장소에 올라온 일감·댓글이 아직 없습니다.<br>아래 입력창에서 첫 지시를 보내 보세요.';
+      } else if (clearedAt){
+        emptyMsg = '이전 대화를 모두 숨겼습니다.';
+      } else {
+        emptyMsg = '아직 말풍선이 없습니다.';
+      }
+      out.push('<div class="empty"><span class="big">💬</span>' + emptyMsg + '</div>');
+      tl.innerHTML = out.join('');
+      renderFilterBar();
+      if (stick) scrollBottom(true);
+      return;
+    }
+    var lastDay = '';
+
     filtered.forEach(function(rec){
       var it = rec.it, mi = rec.i;
       var dk = dayKey(it.t);
@@ -1441,7 +1549,8 @@
               '<span class="t">' + esc(fmtTime(it.t)) + '</span>' +
               (it.live ? '<span class="h">· 실시간</span>' : '') +
             '</div>' +
-            '<div class="bubble' + (it.card ? ' is-card' : '') + '">' +
+            '<div class="bubble' + (it.card ? ' is-card' : '') + (it.mark ? ' mk-' + it.mark.k : '') + '">' +
+              (it.mark ? '<span class="mk mk-' + it.mark.k + '">' + esc(it.mark.label) + '</span>' : '') +
               (it.card ? cardHTML(it.card) : bubbleText(it.text)) +
               (it.chips && it.chips.length
                 ? '<div class="chips">' + it.chips.map(chipHTML).join('') + '</div>'
@@ -1470,6 +1579,29 @@
     if (stick) scrollBottom(true);
   }
 
+  /* 🧹 대화 비우기 — 지금 시각을 저장해 이전 말풍선을 숨긴다 */
+  function clearTimeline(){
+    var now = Date.now();
+    var n = 0;
+    state.items.forEach(function(it){ if (itemTs(it) < now) n++; });
+    state.clearedAt = now;
+    writeLS(CLEAR_KEY, String(now));
+    var b = $('btnClear');
+    if (b) b.classList.add('on');
+    render();
+    toast(n ? ('🧹 이전 대화 ' + n + '건을 숨겼습니다 · 위 배지에서 다시 볼 수 있어요')
+            : '🧹 대화를 비웠습니다', 'ok');
+  }
+  function restoreTimeline(){
+    state.clearedAt = 0;
+    delLS(CLEAR_KEY);
+    var b = $('btnClear');
+    if (b) b.classList.remove('on');
+    render();
+    toast('이전 대화를 다시 표시합니다');
+  }
+
+
   function renderFilterBar(){
     var bar = $('filterBar');
     if (!state.filter){ bar.hidden = true; return; }
@@ -1491,8 +1623,9 @@
     var line = '이슈 ' + live.issues.length + ' · todo ' + c.todo +
       (c.doing ? ' · doing ' + c.doing : '') +
       (c.done ? ' · done ' + c.done : '') +
-      ' · 커밋 ' + live.commits.length + ' · 결과물 ' + live.files.length;
-    return {line:line, issues:live.issues.length, commits:live.commits.length, files:live.files.length};
+      ' · 댓글 ' + (live.comments || []).length +
+      ' · 결과물 ' + live.files.length;
+    return {line:line, issues:live.issues.length, comments:(live.comments || []).length, files:live.files.length};
   }
 
   function renderLiveBar(err){
@@ -1894,7 +2027,7 @@
       ]
     };
     var ack = {
-      kind:'msg', who:'sonseonghun1', t:t,
+      kind:'msg', who:'sonseonghun1', t:t, echoOf:issue.number,
       text:'지시 접수 — ' + whoTxt + ' 이슈로 올렸습니다.' +
         (autoInfo ? ' 한도 여유 기준 자동 배정으로 ' + PEOPLE[target].name + '에게 배정했습니다.' : '') +
         ' 담당 피클이 확인하면 status:doing으로 바꾸고 결과물을 outputs/에 남깁니다.',
@@ -1934,6 +2067,7 @@
 
   $('btnToken').addEventListener('click', openToken);
   $('btnOutputs').addEventListener('click', openOutputs);
+  $('btnClear').addEventListener('click', clearTimeline);
   $('btnRefresh').addEventListener('click', function(){
     if (!state.token){ openToken(); return; }
     loadLive(false);
@@ -2107,6 +2241,7 @@
     if (act === 'token') openToken();
     if (act === 'outputs') openOutputs();
     if (act === 'refresh') loadLive(false);
+    if (act === 'unclear') restoreTimeline();
   });
 
   /* =========================================================
@@ -2121,6 +2256,8 @@
       saveQuota();
     }
     scheduleQuotaReset();
+
+    if (state.clearedAt) $('btnClear').classList.add('on');
 
     buildItems();
     render();
