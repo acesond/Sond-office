@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F6F5FA">
 <meta name="robots" content="noindex,nofollow">
-<meta name="description" content="피클팀 공용 작업방 — 대장과 3번·벨벳·나가 이슈로 일을 나누는 채팅형 작업판">
+<meta name="description" content="피클팀 공용 작업방 — 손성훈(대장)과 벨벳·엄마·3번이 이슈로 일을 나누는 채팅형 작업판">
 <title>🌈 대장 · 피클팀 공용 작업방</title>
 <style>
   :root{
@@ -554,7 +554,7 @@
 
   <div class="livebar" id="liveBar">
     <span class="pip"></span>
-    <span class="txt" id="liveTxt">내장 스냅샷 · 11-28 11:30 기준</span>
+    <span class="txt" id="liveTxt">내장 스냅샷 · 11-28 15:47 기준</span>
     <button id="liveAct" type="button">토큰 연결</button>
   </div>
 
@@ -573,10 +573,10 @@
       <span class="selchip">
         <select id="selTarget" aria-label="대상 피클">
           <option value="all">전체</option>
-          <option value="sond3">[3번]</option>
-          <option value="belbes8">[벨벳]</option>
-          <option value="na63">[나]</option>
-          <option value="sonseonghun1">[손디]</option>
+          <option value="sonseonghun1">대장</option>
+          <option value="belbes8">벨벳</option>
+          <option value="eomma70">엄마</option>
+          <option value="sond3">3번</option>
         </select>
       </span>
       <span class="selchip prj">
@@ -640,17 +640,17 @@
       status:'이슈 대기', short:'합류', ok:true,
       color:'#C22A57', light:'#FF8FB0', initial:'ㅂ'
     },
-    na63: {
-      key:'na63', name:'나', alias:'', handle:'@na63',
-      role:'팀원 · GitHub 연결 대기',
-      status:'GitHub 미연결', short:'미연결', ok:false,
-      color:'#8F97A8', light:'#D2D7E2', initial:'ㄴ'
+    eomma70: {
+      key:'eomma70', name:'엄마', alias:'', handle:'@eomma70',
+      role:'팀원 · 일감 처리',
+      status:'이슈 대기', short:'합류', ok:true,
+      color:'#D9592B', light:'#FFA96F', initial:'ㅇ'
     }
   };
-  var ORDER = ['sonseonghun1','sond3','belbes8','na63'];
+  var ORDER = ['sonseonghun1','belbes8','eomma70','sond3'];
 
   var TARGET_LABEL = {
-    all:'전체', sond3:'[3번]', belbes8:'[벨벳]', na63:'[나]', sonseonghun1:'[손디]'
+    all:'전체', sonseonghun1:'[손디]', belbes8:'[벨벳]', eomma70:'[엄마]', sond3:'[3번]'
   };
   var PROJECT_LABEL = {
     general:'일반', 'daegu-blog':'daegu-blog', 'hotdeal-threads':'hotdeal-threads'
@@ -763,82 +763,85 @@
      초기 내장 스냅샷 — 실제 저장소 상태 (2026-11-28 11:30 KST)
      ========================================================= */
   var SNAP_COMMITS = {
-    '27d2e79':1, 'aa7d76e':1, '25f7575':1, '2e20a1a':1, '2e95a37':1, '281810c':1
+    '27d2e79':1, 'aa7d76e':1, '25f7575':1, '2e20a1a':1, '2e95a37':1, '281810c':1, '990c0aa':1
   };
-  var SNAP_ISSUES = { 1:1 };
+  var SNAP_ISSUES = { 1:1, 2:1, 3:1 };
   var SNAP_COMMENT_KEYS = {
     '1|2026-11-28T01:31:14Z':1,
     '1|2026-11-28T02:28:35Z':1,
-    '1|2026-11-28T02:30:11Z':1
+    '1|2026-11-28T02:30:11Z':1,
+    '1|2026-11-28T06:42:05Z':1,
+    '2|2026-11-28T06:42:08Z':1
   };
 
   function snapshotItems(){
     return [
       {
-        kind:'msg', who:'sond3', t:'2026-11-28T01:25:46+09:00',
-        text:'공용 작업공간 초기 구조를 만들었습니다. `README.md`, `outputs/`, `shared/`, 이슈 템플릿까지 올렸어요.',
-        chips:[{type:'commit', sha:'27d2e79'}],
-        react:[{e:'🙌', n:2}]
+        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:41:00+09:00',
+        text:'오늘부터 손성훈이 대장으로 새로 시작합니다. 기존 공용 작업공간 구성은 전부 폐기하고 `손성훈(대장)·벨벳·엄마·3번` 4인 체제로 다시 엽니다.\n지난 이슈는 모두 정리했고, 팀 표·라벨·온보딩 이슈도 4인 기준으로 새로 만들었습니다.',
+        react:[{e:'🎉', n:3}]
       },
       {
-        kind:'msg', who:'sond3', t:'2026-11-28T01:26:04+09:00',
-        text:'원격 연결·push에 쓸 스크립트를 추가하고, 작업 라벨 5개를 만들었습니다 — status:todo / doing / done, project:daegu-blog / hotdeal-threads.',
-        chips:[{type:'commit', sha:'aa7d76e'}]
-      },
-      {
-        kind:'msg', who:'sond3', t:'2026-11-28T01:38:51+09:00',
-        text:'첫 일감으로 온보딩 이슈 #1을 올렸습니다. 팀원 피클은 이 체크리스트만 끝내면 바로 일감을 받을 수 있어요.',
+        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:42:00+09:00',
+        text:'4인 팀 표입니다. 대장이 일감을 만들어 배분하고, 셋은 자기 말머리 일감만 처리합니다.',
         card:{
-          emoji:'📋', title:'팀원 피클 온보딩', sub:'첫 일감 · 이슈 #1',
-          rows:[['담당','전체 (대장이 분배)'],['상태','todo'],['라벨','status:todo']],
-          link:{label:'이슈 #1 열기', href:REPO_URL + '/issues/1'}
+          emoji:'🐣', title:'손성훈(대장)·벨벳·엄마·3번', sub:'4인 피클팀',
+          rows:[
+            ['총괄 대장','손성훈 · 손디 (@sonseonghun1)'],
+            ['팀원','벨벳 (@belbes8) · 엄마 (@eomma70) · 3번 (@sond3)'],
+            ['담당 구분','말머리 + owner:* 라벨']
+          ],
+          link:{label:'README에서 보기', href:REPO_URL + '/blob/main/README.md'}
         },
-        chips:[{type:'issue', n:1, title:'팀원 피클 온보딩'},{type:'status', v:'todo'},{type:'commit', sha:'25f7575'}],
-        react:[{e:'👍', n:2}]
+        chips:[{type:'label', v:'owner:sonseonghun1'}]
       },
       {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T10:31:14+09:00',
-        text:'총괄 대장 맡았습니다. README 팀 표를 “총괄 대장(손디) + 팀원 3명” 기준으로 정리해 main에 올렸어요.\n3번은 합류 완료, 벨벳·나는 GitHub 연결만 남았습니다.',
+        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:43:00+09:00',
+        text:'담당 라벨을 4인 기준으로 다시 세팅했습니다. `owner:eomma70`(엄마)을 새로 넣고, README와 `scripts/setup-labels.sh`도 새 팀 표로 고쳤어요.',
         chips:[
-          {type:'commit', sha:'2e20a1a'},
-          {type:'label', v:'owner:sonseonghun1'}
+          {type:'commit', sha:'990c0aa'},
+          {type:'label', v:'owner:sonseonghun1'},
+          {type:'label', v:'owner:belbes8'},
+          {type:'label', v:'owner:eomma70'},
+          {type:'label', v:'owner:sond3'}
         ]
       },
       {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T10:39:30+09:00',
-        text:'벨벳(@belbes8) 합류를 팀 표에 반영했습니다. 이제 대장·3번·벨벳 셋이 바로 일감을 돌릴 수 있어요.',
-        chips:[{type:'commit', sha:'2e95a37'}],
-        react:[{e:'🎉', n:1}]
+        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:44:00+09:00',
+        text:'첫 일감으로 4인 온보딩 이슈를 올렸습니다. 벨벳·엄마·3번은 체크리스트만 끝내면 바로 일감을 받습니다.',
+        card:{
+          emoji:'📋', title:'4인 피클팀 온보딩', sub:'첫 일감 · 이슈 #3',
+          rows:[
+            ['담당','전체 (대장이 분배)'],
+            ['상태','todo'],
+            ['라벨','status:todo · owner:sonseonghun1']
+          ],
+          link:{label:'이슈 #3 열기', href:REPO_URL + '/issues/3'}
+        },
+        chips:[{type:'issue', n:3, title:'4인 피클팀 온보딩'},{type:'status', v:'todo'},{type:'commit', sha:'990c0aa'}],
+        react:[{e:'🙌', n:3}]
       },
       {
-        kind:'msg', who:'belbes8', t:'2026-11-28T11:28:35+09:00',
-        text:'벨벳 합류합니다. 저장소 접근 정상(@acesond, 비공개 저장소라 초대 수락은 필요 없었습니다), 10:38 GitHub 연결 완료, 핸들 @belbes8입니다. 한 가지 — 네 분이 @acesond 한 계정을 함께 써서 assignee로는 담당 구분이 안 됩니다. 제목 말머리로 정해 주세요.',
-        card:{
-          emoji:'🙋', title:'벨벳 합류 보고', sub:'@belbes8 · 10:38 GitHub 연결',
-          rows:[['저장소','접근 정상 (비공개)'],['초대','수락 불필요'],['요청','제목 말머리로 담당 구분']],
-          link:{label:'합류 인사 이슈 #1 열기', href:REPO_URL + '/issues/1'}
-        },
-        chips:[
-          {type:'issue', n:1, title:'팀원 피클 온보딩'},
-          {type:'label', v:'owner:belbes8'}
-        ],
+        kind:'msg', who:'belbes8', t:'2026-11-28T15:45:30+09:00',
+        text:'벨벳 대기 중입니다. `[벨벳]` 말머리 + `owner:belbes8` 라벨이 붙은 일감부터 처리하겠습니다.',
+        chips:[{type:'label', v:'owner:belbes8'}],
         react:[{e:'👍', n:2}]
       },
       {
-        kind:'msg', who:'sonseonghun1', t:'2026-11-28T11:30:11+09:00',
-        text:'담당 구분 규칙 확정했습니다 — 이슈 제목 말머리 [손디]·[3번]·[벨벳]·[나] + owner:* 라벨, assignee는 @acesond 고정. 라벨 4개를 만들고 README에 반영했어요.',
-        card:{
-          emoji:'📐', title:'담당 구분 규칙 확정', sub:'main 반영 · 라벨 4개',
-          rows:[['제목','[손디] · [3번] · [벨벳] · [나]'],['라벨','owner:*'],['assignee','@acesond 고정']],
-          link:{label:'README에서 보기', href:REPO_URL + '/blob/main/README.md'}
-        },
-        chips:[
-          {type:'commit', sha:'281810c'},
-          {type:'label', v:'owner:sond3'},
-          {type:'label', v:'owner:belbes8'},
-          {type:'label', v:'owner:na63'}
-        ],
-        react:[{e:'🙌', n:3}]
+        kind:'msg', who:'eomma70', t:'2026-11-28T15:46:00+09:00',
+        text:'엄마도 준비됐습니다. `[엄마]` 말머리 + `owner:eomma70` 라벨로 일감 주세요.',
+        chips:[{type:'label', v:'owner:eomma70'}],
+        react:[{e:'🙌', n:2}]
+      },
+      {
+        kind:'msg', who:'sond3', t:'2026-11-28T15:46:30+09:00',
+        text:'3번 그대로 있습니다. `[3번]` 말머리 + `owner:sond3` 라벨로 받습니다.',
+        chips:[{type:'label', v:'owner:sond3'}]
+      },
+      {
+        kind:'msg', who:'sonseonghun1', t:'2026-11-28T15:47:00+09:00',
+        text:'좋습니다. 벨벳·엄마·3번 모두 대기 확인했습니다. 아래 입력창에서 담당을 고르고 지시를 보내면 그 말머리와 `owner:*` 라벨이 붙은 이슈가 바로 생깁니다.',
+        chips:[{type:'status', v:'todo'}]
       }
     ];
   }
@@ -968,9 +971,11 @@
   function guessAuthor(text){
     var head = String(text || '').split('\n')[0] || '';
     if (/벨벳/.test(head)) return 'belbes8';
+    if (/엄마/.test(head)) return 'eomma70';
     if (/3번/.test(head)) return 'sond3';
     if (/손디/.test(head)) return 'sonseonghun1';
     if (/벨벳/.test(text)) return 'belbes8';
+    if (/엄마/.test(text)) return 'eomma70';
     return 'sonseonghun1';
   }
 
@@ -1199,7 +1204,7 @@
     if (!state.token){
       out.push('<div class="sys">' +
         '<span class="ico" aria-hidden="true">🔑</span>' +
-        '<div><b>내장 스냅샷으로 보고 있어요.</b> 2026-11-28 11:30 기준 저장소 상태입니다. ' +
+        '<div><b>내장 스냅샷으로 보고 있어요.</b> 2026-11-28 15:47 기준 저장소 상태입니다. ' +
         'GitHub 토큰을 한 번 넣어 두면 이 방이 실시간으로 바뀌고, 아래 입력창의 지시가 실제 이슈로 올라갑니다.' +
         '<div class="btn-row">' +
           '<button class="mini" data-act="token">🔑 GitHub 토큰 설정</button>' +
@@ -1310,7 +1315,7 @@
       $('btnToken').classList.add('on');
       return;
     }
-    txt.innerHTML = '내장 스냅샷 · 11-28 11:30 기준 · 토큰을 연결하면 실시간';
+    txt.innerHTML = '내장 스냅샷 · 11-28 15:47 기준 · 토큰을 연결하면 실시간';
     act.textContent = '토큰 연결';
     $('cmpHint').innerHTML = '전체 = <b>[공용]</b> 이슈 · 토큰을 연결하면 바로 생성됩니다';
   }
@@ -1364,13 +1369,10 @@
     var joinTxt = p.ok
       ? '<span class="okdot">✅ 합류 완료</span>'
       : '<span class="waitdot">⏳ 연결 대기</span>';
-    var ghTxt = key === 'na63' ? '미연결' : '@' + OWNER;
+    var ghTxt = '@' + OWNER;
 
     var note = '';
-    if (key === 'na63'){
-      note = '<div class="note warn"><b>나(@na63) 피클은 아직 GitHub이 연결되지 않았습니다.</b> ' +
-        '폰에서 GitHub(@' + OWNER + ') 연결을 마치고 이슈 #1에 자기 핸들을 댓글로 남기면, 그때부터 [나] 말머리 일감을 받습니다.</div>';
-    } else if (key === 'sonseonghun1'){
+    if (key === 'sonseonghun1'){
       note = '<div class="note">일감을 만들어 배분하고, 결과물을 취합·검수합니다. 모든 이슈의 담당 구분은 <b>제목 말머리 + owner:* 라벨</b>로 합니다.</div>';
     } else {
       note = '<div class="note">배정된 이슈만 처리합니다. 시작할 때 <b>status:doing</b>, 결과물은 <b>outputs/&lt;프로젝트&gt;/&lt;날짜&gt;-&lt;주제&gt;.md</b>, 완료 댓글 뒤 <b>status:done</b>.</div>';
