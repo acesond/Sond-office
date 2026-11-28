@@ -582,6 +582,7 @@
   .btn:active{transform:translateY(1px)}
   .btn.primary{background:var(--violet);border-color:transparent;color:#fff;box-shadow:0 8px 20px rgba(108,77,255,.26)}
   .btn.block{width:100%}
+  .btn.chatopen{margin-top:12px;min-height:46px;font-size:13px;text-decoration:none}
   .btn-row2{display:flex;gap:8px;margin-top:14px}
   .btn-row2 .btn{flex:1 1 0;min-width:0}
 
@@ -798,6 +799,13 @@
     }
   };
   var ORDER = ['sonseonghun1','belbes8','eomma70','sond3'];
+
+  /* 💬 피클 앱 대화방 바로가기(딥링크) — 피클 상세 시트에서 해당 대화방을 바로 엽니다 */
+  var PICKLE_CHAT = {
+    belbes8: 'pickle://chat?room_id=01a20e2a-4076-7238-9961-a447141b356c',   // 1호기
+    eomma70: 'pickle://chat?room_id=01a220e3-4c85-7275-bcd0-71ec333aec03',   // 2호기
+    sond3:   'pickle://chat?room_id=01a21dd6-83a8-7565-a03a-af5d38b9cb60'    // 3호기
+  };
 
   var TARGET_LABEL = {
     all:'전체', auto:'자동(여유)', sonseonghun1:'[손디]', belbes8:'[1호기]', eomma70:'[2호기]', sond3:'[3호기]'
@@ -2107,6 +2115,7 @@
         '<dt>GitHub</dt><dd>' + esc(ghTxt) + '</dd>' +
         '<dt>일감</dt><dd>' + loadTxt + '</dd>' +
       '</dl>' +
+      chatOpenHTML(key) +
       workHTML(key) +
       messagesHTML(key) +
       '<h3 class="sh">한도 여유 설정 <span class="n">매일 04:00 리셋</span></h3>' +
@@ -2120,6 +2129,14 @@
       '</div>';
 
     openSheet(p.name + ' 피클', html, key);
+  }
+
+  /* 💬 피클 앱 대화방 열기 버튼 (대화방 ID가 있는 팀원만) */
+  function chatOpenHTML(key){
+    var url = PICKLE_CHAT[key];
+    if (!url) return '';
+    return '<a class="btn primary block chatopen" href="' + esc(url) + '" data-room="' + esc(key) + '">' +
+      '💬 피클 앱 대화방 열기</a>';
   }
 
   /* ── 토큰 시트 ── */
