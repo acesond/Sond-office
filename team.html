@@ -1617,7 +1617,7 @@
     if (!live) return {line:'', issues:0, commits:0, files:0};
     var c = {todo:0, doing:0, done:0};
     live.issues.forEach(function(i){
-      var st = statusOfIssue(i) || 'todo';
+      var st = statusOfIssue(i) || (i.state === 'closed' ? 'done' : 'todo');
       c[st]++;
     });
     var line = '이슈 ' + live.issues.length + ' · todo ' + c.todo +
